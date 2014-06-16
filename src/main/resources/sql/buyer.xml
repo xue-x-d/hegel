@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "sql-map-2.dtd">
+<sqlMap namespace="shomopcrm">
+	<typeAlias alias="FilterCondition"  type="com.shomop.crm.model.FilterCondition" />
+	<typeAlias alias="NotifyTrade"  type="com.taobao.api.domain.NotifyTrade" />
+	<typeAlias alias="User" type="com.shomop.crm.model.User" />
+	
+		 <sql id="selectBuySql">
+			select user,id,b.buyerNick,buyerMobile,buyerState,buyerCity,buyNum,buyAmountPrice,nopayPrice,aveMonthBuyPrice,tradeAvePrice,buyCyclist,
+			lastBuyTime,buyerLevel,neutralRate,badRate,buyerName,thisMonthBuyPrice,sendTime,buyerId from buyer b
+		</sql>
+		<!-- buyer的一些统计 -->
+		<sql id="selectGroupValue">
+			select
+				 count(*) as total,sum(buyNum) as buyNumTotal,sum(buyAmountPrice) as buyAmountPrice
+			   ,avg(buyCyclist) as buyCyclist,max(lastBuyTime) as lastBuyTime ,
+			    cast(sum(buyAmountPrice)*10000/(select sum(buyAmountPrice)+0.1 from buyer where user=#user# )  as unsigned  int)  as priceProportion
+			   from buyer b
+		</sql>
+		<!-- 分组电话号码统计 -->
+		<sql id="selectMobileCount">
+			select (case when buyerMobile regexp '^(13[0-2]|145|155|156|185|186).*' then 1 when buyerMobile regexp '^(134[0-8]|13[5-9]|147|15[7-9]|15[0-2]|18[2-4]|187|188).*' then 2 when buyerMobile regexp '^(133|1349|153|180|181|189).*' then 3 else 0 end) as mobileType,count(distinct(buyerMobile)) from buyer b
+		</sql>
+		<sql id="getBuyer">
+		    <![CDATA[ and b.blacklist = 0 ]]>
+			<isNotEqual prepend="and" property="minTradeAvePrice" compareValue="-1">
+					b.TradeAvePrice >= #minTradeAvePrice#
+			</isNotEqual>
+			<isNotEqual prepend="and" property="maxTradeAvePrice" compareValue="-1">
+					<![CDATA[b.TradeAvePrice <= #maxTradeAvePrice#]]>
+			</isNotEqual>
+			<isNotEqual prepend="and" property="minAveMonthBuyPrice" compareValue="-1">
+					b.AveMonthBuyPrice >= #minAveMonthBuyPrice#
+			</isNotEqual>
+			<isNotEqual prepend="and" property="maxAveMonthBuyPrice" compareValue="-1">
+					<![CDATA[b.AveMonthBuyPrice <= #maxAveMonthBuyPrice#]]>
+			</isNotEqual>
+			<isNotEqual prepend="and" property="minLastBuyTime" compareValue="-1">
+					<![CDATA[b.LastBuyTime <= #minLastBuyTime#]]>
+			</isNotEqual>
+			<isNotEqual prepend="and" property="maxLastBuyTime" compareValue="-1">
+					<![CDATA[b.LastBuyTime >= #maxLastBuyTime#]]>
+			</isNotEqual>
+			<isNotEqual prepend="and" property="minBuyCyclist" compareValue="-1">
+					b.BuyCyclist >= #minBuyCyclist#
+			</isNotEqual>
+			<isNotEqual prepend="and" property="maxBuyCyclist" compareValue="-1">
+					<![CDATA[b.BuyCyclist <= #maxBuyCyclist#]]>
+			</isNotEqual>
+			<isNotEqual prepend="and" property="minBuyNum" compareValue="-1">
+					b.BuyNum >= #minBuyNum#
+			</isNotEqual>
+			<isNotEqual prepend="and" property="maxBuyNum" compareValue="-1">
+					<![CDATA[b.BuyNum <= #maxBuyNum#]]>
+			</isNotEqual>
+			<isNotEqual prepend="and" property="minBuyAmountPrice" compareValue="-1">
+					b.BuyAmountPrice >= #minBuyAmountPrice#
+			</isNotEqual>
+			<isNotEqual prepend="and" property="maxBuyAmountPrice" compareValue="-1">
+					<![CDATA[b.BuyAmountPrice <= #maxBuyAmountPrice#]]>
+			</isNotEqual>
+			<isNotEqual prepend="and" property="minThisMonthBuyPrice" compareValue="-1">
+					b.ThisMonthBuyPrice >= #minThisMonthBuyPrice#
+			</isNotEqual>
+			<isNotEqual prepend="and" property="maxThisMonthBuyPrice" compareValue="-1">
+					<![CDATA[b.ThisMonthBuyPrice <= #maxThisMonthBuyPrice#]]>
+			</isNotEqual>
+			<isNotEmpty prepend="and" property="buyerNick">
+					b.buyerNick = #buyerNick#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="buyerName">
+					b.buyerName = #buyerName#
+			</isNotEmpty>		
+			<isNotEqual prepend="and" property="minBuyerLevel" compareValue="-1">
+					b.BuyerLevel >= #minBuyerLevel#
+			</isNotEqual>
+			<isNotEqual prepend="and" property="maxBuyerLevel" compareValue="-1">
+					<![CDATA[b.BuyerLevel <= #maxBuyerLevel#]]>
+			</isNotEqual>
+			<isNotEqual prepend="and" property="grade" compareValue="-1">
+					b.grade = #grade#
+			</isNotEqual>
+			 <isNotEmpty prepend="and" property="buyerState">
+					 ($buyerState$)
+			</isNotEmpty>		
+			<isNotEmpty prepend="and" property="filterSql">
+					 $filterSql$
+			</isNotEmpty>	
+			<isNotEmpty prepend="and" property="groupId">
+					 b.groupIds like  #groupId#
+			</isNotEmpty>		
+			<isNotEmpty prepend="and" property="buyMaxNumCid">
+					(b.buyMaxNumCid1  in ($buyMaxNumCid$) or b.buyMaxNumCid2   in ($buyMaxNumCid$) or b.buyMaxNumCid3  in ($buyMaxNumCid$)) 
+			</isNotEmpty>	
+			<isNotEqual prepend="and" property="minNeutralRate" compareValue="-1">
+					b.NeutralRate >= #minNeutralRate#
+			</isNotEqual>
+			<isNotEqual prepend="and" property="maxNeutralRate" compareValue="-1">
+					<![CDATA[b.NeutralRate <= #maxNeutralRate#]]>
+			</isNotEqual>
+			<isNotEqual prepend="and" property="minBadRate" compareValue="-1">
+					b.BadRate >= #minBadRate#
+			</isNotEqual>
+			<isNotEqual prepend="and" property="maxBadRate" compareValue="-1">
+					<![CDATA[b.BadRate <= #maxBadRate#]]>
+			</isNotEqual>
+			<isEqual prepend="and" property="badRate" compareValue="=0">
+					b.badRate $badRate$
+			</isEqual>
+			<isEqual prepend="and" property="neutralRate"  compareValue="=0">
+					b.buyerName  $neutralRate$
+			</isEqual>	
+			<isNotEqual prepend="and" property="minSendTime" compareValue="-1">
+					b.SendTime >= #minSendTime#
+			</isNotEqual>
+			<isNotEqual prepend="and" property="maxSendTime" compareValue="-1">
+					<![CDATA[b.SendTime <= #maxSendTime#]]>
+			</isNotEqual>
+		</sql>
+	<!-- 查询分组条件 -->
+	<select id="getFilterCondition"  resultClass="java.lang.String"  parameterClass="string">
+		<![CDATA[
+			select
+				f.minBuyCyclist,f.maxBuyCyclist ,f.tradeAvePrice  ,f.lastBuyTime ,f.buyerState,f.buyerCity,f.buyMaxNumCid,f.aveMonthBuyPrice ,f.buyerLevel ,f.badRate ,f.buyNum,f.groupId,f.grade,
+				f.neutralRate ,f.numIid,f.buyerNick,f.buyerName,f.minPurchaseDay,f.maxPurchaseDay,f.minBuyAmountPrice,f.maxBuyAmountPrice,f.minThisMonthBuyPrice,f.filterSql,f.propsName,f.cid,
+				f.maxThisMonthBuyPrice,f.minSendTime,f.maxSendTime,f.logisticsStatus, f.filterOutNumIid,c.id as customerGroupId,u.username as sellerNick,u.id as user
+		  from 
+			   filter_condition f,customer_group c,user u
+		  where
+		        c.id = f.customerGroup and u.id=c.user and c.id='$value$'
+		]]>
+	</select>
+	
+	<!-- 插入动态分组(过滤numiid) 	-->
+	<insert id="getCustomerfilterNumiid"  parameterClass="FilterCondition">
+		<include refid="selectBuySql"/>
+		<![CDATA[
+			LEFT JOIN (SELECT DISTINCT(buyerNick) FROM trade_order o 	where o.user=#user#    and status in ('WAIT_SELLER_SEND_GOODS','WAIT_BUYER_CONFIRM_GOODS','TRADE_BUYER_SIGNED','TRADE_FINISHED')  AND numIid in ($filterOutNumIid$)  
+		]]>
+		<![CDATA[
+			) t 	on  b.buyernick = t.buyernick where	b.user = #user# and t.buyerNick is null
+		]]>
+		<include refid="getBuyer"/>
+	</insert>
+	<insert id="getCountfilterNumiid"  parameterClass="FilterCondition">
+		<include refid="selectGroupValue"/>
+		<![CDATA[
+			LEFT JOIN (SELECT DISTINCT(buyerNick) FROM trade_order o 	where o.user=#user#    and status in ('WAIT_SELLER_SEND_GOODS','WAIT_BUYER_CONFIRM_GOODS','TRADE_BUYER_SIGNED','TRADE_FINISHED')  AND numIid in ($filterOutNumIid$)  
+		]]>
+		<![CDATA[
+			) t  on  b.buyernick = t.buyernick	where	b.user = #user# and t.buyerNick is null
+		]]>
+		<include refid="getBuyer"/>
+	</insert>
+	<insert id="getMobilefilterNumiid"  parameterClass="FilterCondition">
+				<![CDATA[
+		select (case when buyerMobile regexp '^(13[0-2]|145|155|156|185|186).*' then 1 when buyerMobile regexp '^(134[0-8]|13[5-9]|147|15[7-9]|15[0-2]|18[2-4]|187|188).*' then 2 when buyerMobile regexp '^(133|1349|153|180|181|189).*' then 3 else 0 end) as mobileType,count(distinct(buyerMobile))
+		 from (
+		]]>
+		<include refid="selectBuySql"/>
+		<![CDATA[
+			LEFT JOIN (SELECT DISTINCT(buyerNick) FROM trade_order o 	where o.user=#user#    and status in ('WAIT_SELLER_SEND_GOODS','WAIT_BUYER_CONFIRM_GOODS','TRADE_BUYER_SIGNED','TRADE_FINISHED')  AND numIid in ($filterOutNumIid$)  
+		]]>
+		<![CDATA[
+			) t 	on  b.buyernick = t.buyernick where	 b.user = #user# and t.buyerNick is null
+		]]>
+		<include refid="getBuyer"/>
+		<![CDATA[
+					) a
+		]]>
+	    <![CDATA[  group by mobileType]]>
+	</insert>
+
+		<!-- 插入动态分组(过滤numiid) 又有时间段	-->
+	<insert id="getCustomerfilterNumiid1"  parameterClass="FilterCondition">
+		<![CDATA[
+			select b.* from 
+			(select user,id,n.buyerNick,buyerMobile,buyerState,buyerCity,buyNum,buyCyclist,buyAmountPrice,nopayPrice,aveMonthBuyPrice,tradeAvePrice,
+			lastBuyTime,buyerLevel,neutralRate,badRate,buyMaxNumCid1,buyMaxNumCid2,buyMaxNumCid3,buyerName,thisMonthBuyPrice,sendTime,blacklist from buyer n
+			RIGHT JOIN (SELECT DISTINCT(buyerNick) FROM trade_order o 	where o.user=#user#    and status in ('WAIT_SELLER_SEND_GOODS','WAIT_BUYER_CONFIRM_GOODS','TRADE_BUYER_SIGNED','TRADE_FINISHED')  and  o.created  >= #minPurchaseDay# and o.created <= #maxPurchaseDay# ) t ON n.buyerNick = t.buyerNick  WHERE n.user = #user# ) 
+			b 
+			LEFT JOIN (
+			SELECT DISTINCT(buyerNick) FROM trade_order WHERE user = #user#  AND numIid in ($filterOutNumIid$)  and status in ('WAIT_SELLER_SEND_GOODS','WAIT_BUYER_CONFIRM_GOODS','TRADE_BUYER_SIGNED','TRADE_FINISHED')  and 		created  >= #minPurchaseDay# and created <= #maxPurchaseDay#)
+			 t 	
+			 on  b.buyernick = t.buyernick where	b.user = #user# and t.buyerNick is null
+		]]>
+		<include refid="getBuyer"/>
+	</insert>
+	<insert id="getCountfilterNumiid1"  parameterClass="FilterCondition">
+		<![CDATA[
+		select count(*) as total,sum(buyNum) as buyNumTotal,sum(buyAmountPrice) as buyAmountPrice ,avg(buyCyclist) as buyCyclist,max(lastBuyTime) as lastBuyTime , cast(sum(buyAmountPrice)*10000/(select sum(buyAmountPrice)+0.1 from buyer where user=#user# )  as unsigned  int)  as priceProportion
+	    from (
+		]]>
+		<![CDATA[
+			select b.* from 
+			(select user,id,n.buyerNick,buyerMobile,buyerState,buyerCity,buyNum,buyCyclist,buyAmountPrice,nopayPrice,aveMonthBuyPrice,tradeAvePrice,
+			lastBuyTime,buyerLevel,neutralRate,badRate,buyerName,thisMonthBuyPrice,sendTime,blacklist from buyer n
+			RIGHT JOIN (SELECT DISTINCT(buyerNick) FROM trade_order o 	where o.user=#user#  and status in ('WAIT_SELLER_SEND_GOODS','WAIT_BUYER_CONFIRM_GOODS','TRADE_BUYER_SIGNED','TRADE_FINISHED')  and  o.created  >= #minPurchaseDay# and o.created <= #maxPurchaseDay# ) t ON n.buyerNick = t.buyerNick  WHERE n.user = #user# ) 
+			b 
+			LEFT JOIN (
+			SELECT DISTINCT(buyerNick) FROM trade_order WHERE user = #user#    and status in ('WAIT_SELLER_SEND_GOODS','WAIT_BUYER_CONFIRM_GOODS','TRADE_BUYER_SIGNED','TRADE_FINISHED')  AND numIid in ($filterOutNumIid$ ) 	and 		created  >= #minPurchaseDay# and created <= #maxPurchaseDay#)
+			 t 	
+			 on  b.buyernick = t.buyernick where	b.user = #user# and t.buyerNick is null
+		]]>
+		<include refid="getBuyer"/>
+		<![CDATA[
+					) a
+		]]>
+	</insert>
+	<insert id="getMobilefilterNumiid1"  parameterClass="FilterCondition">
+			<![CDATA[
+		select (case when buyerMobile regexp '^(13[0-2]|145|155|156|185|186).*' then 1 when buyerMobile regexp '^(134[0-8]|13[5-9]|147|15[7-9]|15[0-2]|18[2-4]|187|188).*' then 2 when buyerMobile regexp '^(133|1349|153|180|181|189).*' then 3 else 0 end) as mobileType,count(distinct(buyerMobile))
+		 from (
+		]]>
+		<![CDATA[
+			select b.* from 
+			(select user,id,n.buyerNick,buyerMobile,buyerState,buyerCity,buyNum,buyCyclist,buyAmountPrice,nopayPrice,aveMonthBuyPrice,tradeAvePrice,
+			lastBuyTime,buyerLevel,neutralRate,badRate,buyerName,thisMonthBuyPrice,sendTime,blacklist from buyer n
+			RIGHT JOIN (SELECT DISTINCT(buyerNick) FROM trade_order o 	where o.user=#user#  and status in ('WAIT_SELLER_SEND_GOODS','WAIT_BUYER_CONFIRM_GOODS','TRADE_BUYER_SIGNED','TRADE_FINISHED')  and  o.created  >= #minPurchaseDay# and o.created <= #maxPurchaseDay# ) t ON n.buyerNick = t.buyerNick  WHERE n.user = #user# ) 
+			b 
+			LEFT JOIN (
+			SELECT DISTINCT(buyerNick) FROM trade_order WHERE user = #user#  AND numIid in ($filterOutNumIid$)  	and 		created  >= #minPurchaseDay# and created <= #maxPurchaseDay#)
+			 t 	
+			 on  b.buyernick = t.buyernick where	b.user = #user# and t.buyerNick is null
+		]]>
+		<include refid="getBuyer"/>
+		<![CDATA[
+					) a
+		]]>
+			<![CDATA[  group by mobileType ]]>
+	</insert>
+	
+	
+	<!-- 插入动态分组(含查子订单) -->
+	<insert id="getCustomerHaveOrder"  parameterClass="FilterCondition">
+		<include refid="selectBuySql"/>
+		<![CDATA[
+			 RIGHT JOIN (SELECT DISTINCT(buyerNick) FROM trade_order o WHERE user = #user# 
+			 and status in ('WAIT_SELLER_SEND_GOODS','WAIT_BUYER_CONFIRM_GOODS','TRADE_BUYER_SIGNED','TRADE_FINISHED')
+		]]>
+		<isNotEmpty prepend="and" property="numIid" >
+				o.numIid in ($numIid$) 
+		</isNotEmpty>	
+		<isNotEqual prepend="and" property="minPurchaseDay" compareValue="-1">
+				o.created  >= #minPurchaseDay#
+		</isNotEqual>	
+		<isNotEqual prepend="and" property="maxPurchaseDay" compareValue="-1">
+			<![CDATA[o.created <= #maxPurchaseDay#]]> 
+		</isNotEqual>	
+		<isNotEmpty prepend="and" property="propsName" >
+				o.popid in ($propsName$) 
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cid" >
+				o.cid in ($cid$) 
+		</isNotEmpty>
+		<!-- <isNotEmpty prepend="and" property="status">
+				o.status in  ($status$)
+		</isNotEmpty> -->
+		<![CDATA[
+			) t ON b.buyerNick = t.buyerNick 	where	b.user = #user#
+		]]>
+		<include refid="getBuyer"/>
+	</insert>
+	<!-- 统计分组信息(不查子订单) -->
+	<select id="getCountHaveOrder"  parameterClass="FilterCondition">
+	<include refid="selectGroupValue"/>
+		<![CDATA[
+			 RIGHT JOIN (SELECT DISTINCT(buyerNick) FROM trade_order o WHERE user = #user# 
+			  and status in ('WAIT_SELLER_SEND_GOODS','WAIT_BUYER_CONFIRM_GOODS','TRADE_BUYER_SIGNED','TRADE_FINISHED')
+		]]>
+		<isNotEmpty prepend="and" property="numIid" >
+				o.numIid in ($numIid$) 
+		</isNotEmpty>	
+		<isNotEqual prepend="and" property="minPurchaseDay" compareValue="-1">
+				o.created  >= #minPurchaseDay#
+		</isNotEqual>	
+		<isNotEqual prepend="and" property="maxPurchaseDay" compareValue="-1">
+			<![CDATA[o.created <= #maxPurchaseDay#]]> 
+		</isNotEqual>	
+		<isNotEmpty prepend="and" property="propsName" >
+				o.popid in ($propsName$) 
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cid" >
+				o.cid in ($cid$) 
+		</isNotEmpty>
+		<![CDATA[
+			) t ON b.buyerNick = t.buyerNick 	where	b.user = #user#
+		]]>
+		<include refid="getBuyer"/>
+	</select>
+	<!-- 查询分组电话类型数(查子订单)  -->
+	<select id="getMobileHaveOrder"  parameterClass="FilterCondition">
+			<include refid="selectMobileCount"/>
+		<![CDATA[
+			 RIGHT JOIN (SELECT DISTINCT(buyerNick) FROM trade_order o WHERE user = #user# 
+			  and status in ('WAIT_SELLER_SEND_GOODS','WAIT_BUYER_CONFIRM_GOODS','TRADE_BUYER_SIGNED','TRADE_FINISHED')
+		]]>
+		<isNotEmpty prepend="and" property="numIid" >
+				o.numIid in  ($numIid$) 
+		</isNotEmpty>	
+		<isNotEqual prepend="and" property="minPurchaseDay" compareValue="-1">
+				o.created  >= #minPurchaseDay#
+		</isNotEqual>	
+		<isNotEqual prepend="and" property="maxPurchaseDay" compareValue="-1">
+			<![CDATA[o.created <= #maxPurchaseDay#]]> 
+		</isNotEqual>	
+		<isNotEmpty prepend="and" property="propsName" >
+				o.popid in ($propsName$) 
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cid" >
+				o.cid in ($cid$) 
+		</isNotEmpty>
+		<![CDATA[
+			) t ON b.buyerNick = t.buyerNick 	where	b.user = #user#
+		]]>
+		<include refid="getBuyer"/>
+			<![CDATA[  group by mobileType ]]>
+	</select>
+	
+	
+	<!-- 插入动态分组(不查子订单) -->
+	<select id="getCustomerNotHaveOrder"  parameterClass="FilterCondition">
+	<include refid="selectBuySql" />
+			<![CDATA[ where	b.user = #user# ]]>
+	<include refid="getBuyer" />
+	</select>
+	<!-- 统计分组信息(不查子订单) -->
+	<select id="getCountNotHaveOrder"  parameterClass="FilterCondition">
+	<include refid="selectGroupValue" />
+			<![CDATA[ where	b.user = #user# ]]>
+	<include refid="getBuyer" />
+	</select>
+	<!-- 查询分组电话类型数(不查子订单)  -->
+	<select id="getMobileNotHaveOrder"  parameterClass="FilterCondition">
+	<include refid="selectMobileCount" />
+			<![CDATA[ where	b.user = #user# ]]>
+	<include refid="getBuyer" />
+			<![CDATA[  group by mobileType ]]>
+	</select>
+	
+	
+	<!-- 查询模板,余额,是否发过短信 -->
+	<select id="findUserSms"  resultClass="java.lang.String"  parameterClass="NotifyTrade" >
+	<![CDATA[
+			select 
+					u.id,u.accessToken,r.status,u.mktBalance from user u   
+					LEFT JOIN remind_template r on r.user= u.id  and r.type in (105,106,202) and r.status=1
+			WHERE
+					 u.userid = #userId# and r.status is not null order by r.type 
+	]]>
+	</select>
+	<!-- 查询buyer的平均值 -->
+	<select id="getBuyerAvgValue"  resultClass="java.lang.String"  parameterClass="java.util.HashMap" >
+	<![CDATA[
+			select avg($column$) from buyer where user=#user#
+	]]>
+	</select>
+	
+	
+	
+	<!-- 查询buyer的分布图 -->
+	<select id="getBuyerInterval"  resultClass="java.lang.String"  parameterClass="java.util.HashMap" >
+		<![CDATA[
+				 select 
+				 		count(id),#column# from buyer  
+				 where 
+				 		user=#user# 
+				 group by receiverState order by count(*)  
+		]]>
+	</select>
+	
+	<!-- 取某一区间的个数 -->
+	<select id="getBuyerCount"  resultClass="java.lang.String"  parameterClass="java.util.HashMap" >
+		<![CDATA[
+				 insert into intervals (id,user,deleted,name,value,updateTime,type)  select REPLACE(uuid(),'-','') as id, #user# as user,0 as deleted ,$column$ as name,
+			     count(id) as value,UNIX_TIMESTAMP(now())*1000 as updateTime	, #type# as type
+				 		 from buyer  
+				 where 
+				 		user=#user# 
+				 group by $column$ 
+		]]>
+
+	</select>
+		<!-- 分布图 -->
+		<select id="getBuyerCountDynamic"  resultClass="java.lang.String"  parameterClass="java.util.HashMap" >
+		<![CDATA[
+				 insert into intervals (id,user,deleted,name,value,updateTime,type)  select REPLACE(uuid(),'-','') as id, #user# as user,0 as deleted ,#name# as name,
+			     count(id) as value,UNIX_TIMESTAMP(now())*1000 as updateTime	, #type# as type
+				 		 from buyer  
+				 where 
+				 		user=#user# 
+		]]>
+		<isNotEmpty prepend="and"  property="maxValue" >
+			<![CDATA[$column$ < #maxValue#]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and"  property="minValue" >
+				$column$ >= #minValue#
+		</isNotEmpty>
+	</select>
+	<!-- 宝贝购买分布 -->
+	<select id="getOrderNumiid"  resultClass="java.lang.String"  parameterClass="java.util.HashMap" >
+				<![CDATA[
+					 insert into intervals (id,user,deleted,name,value,updateTime,type)  select REPLACE(uuid(),'-','') as id, #user# as user,0 as deleted ,o.$column$ as name,
+			     count(o.id) as value,UNIX_TIMESTAMP(now())*1000 as updateTime	, #type# as type
+				 		 from orders o,trade t   
+				 where 
+				 		t.user=#user# and o.tid=t.tid 
+				 group by o.$column$ having count(o.id) >0
+				]]>
+	</select>
+	<!-- 回头客宝贝购买次数分布 -->
+	<select id="insertRetrunCustomerNumiidNum"  resultClass="java.lang.String"  parameterClass="java.util.HashMap" >
+			<![CDATA[
+			 		insert into intervals 
+			 			(id,user,deleted,name,value,updateTime,type) 
+			 		select 
+			 				REPLACE(uuid(),'-','') as id, '$value$' as user,0 as deleted ,title as name,sum(num) as value,UNIX_TIMESTAMP(now())*1000 as updateTime	, 7 as type 
+			 			from  
+			 				(select count(*) as num ,o.numiid,o.title,t.buyernick from orders o,trade t where t.user= '$value$' and o.tid=t.tid group by o.numiid,t.buyernick having count(*) >1)  b 
+			 			group by numiid having sum(num) >0
+			]]>
+	</select>
+	
+	<!-- 回头客消费间隔 -->
+	<select id="insertRetrunCustomerBuyerDistance"  resultClass="java.lang.String"  parameterClass="java.util.HashMap" >
+			<![CDATA[
+				 	insert into intervals 
+			 			(id,user,deleted,name,value,updateTime,type) 
+			 		select 
+			 				REPLACE(uuid(),'-','') as id, #user# as user,0 as deleted ,#name# as name,count(id) as value,UNIX_TIMESTAMP(now())*1000 as updateTime, 8 as type 
+			 		from  buyer b
+			 		where b.buyNum >1 and user = #user#
+			 ]]>
+			<isNotEmpty prepend="and"  property="maxValue" >
+				<![CDATA[(lastBuyTime - firstBuyTime)/b.buyNum < #maxValue#*86400000]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="and"  property="minValue" >
+					(lastBuyTime - firstBuyTime)/b.buyNum >= #minValue#*86400000
+			</isNotEmpty>
+	</select>
+	
+	<!-- 取某一区间的个数 -->
+	<select id="getBuyerAvg"  resultClass="java.lang.String"  parameterClass="java.util.HashMap" >
+			<![CDATA[
+				 select 
+				 		avg($column$) from buyer  
+				 where 
+				 		user=#user# 
+			]]>
+	</select>
+	<!-- 用户的一些统计值 -->
+	<select id="getShopCount" resultClass="java.lang.String"  parameterClass="string" >
+		<![CDATA[
+		Select
+				  ceil(avg(tradeAvePrice) ) as tradeAvePrice, ceil(avg(buyAmountPrice) ) as buyAmountPrice 
+		from buyer 
+				where user='$value$'
+		]]>
+	</select>
+	
+	<!-- 查询用户的客单价,和总消费金额(平均) -->
+	<select id="getAveAndAmountValue" resultClass="java.lang.String"  parameterClass="java.util.HashMap" >
+		<![CDATA[
+			select aveValue,amountValue from (select ceil(tradeAvePrice) as aveValue,user from buyer where user=#user# order by tradeAvePrice desc limit #rowNum#,1) ave
+			left join  (select ceil(buyAmountPrice) amountValue,user from buyer where user=#user# order by buyAmountPrice desc limit #rowNum#,1) amount on ave.user=amount.user;
+			]]>
+	</select>
+	<!--统计回头客平均频率 -->
+	<select id="getBuyCyclist" resultClass="java.lang.String"  parameterClass="string" >
+		<![CDATA[
+		Select
+				  ceil(avg(BuyCyclist) )as BuyCyclist
+		from buyer 
+				where user='$value$' and BuyCyclist != 0
+		]]>
+	</select>
+	<!-- 插入所有用户组条件 -->
+	<insert id="insertAllBuyer" parameterClass="string" >
+				<![CDATA[
+					insert into filter_condition (id,deleted,customerGroup) value (REPLACE(uuid(),'-','') ,0,'$value$')
+				]]>
+	</insert>
+	<!-- 活跃分组条件 -->
+	<insert id="insertActiveCustomer" parameterClass="java.util.HashMap" >
+				<![CDATA[
+					insert into filter_condition 
+								(id,deleted,customerGroup,filterSql) 
+					value 
+								(REPLACE(uuid(),'-','') ,0,#customerGroup#,'(buynum>=2 or lastbuytime > (UNIX_TIMESTAMP(date_format(now(), \'%Y-%m-%d 00:00:00\'))*1000-8640000*14))')
+				]]>
+	</insert>
+		<!-- 淘宝分组条件 -->
+		<insert id="insertTaobaoCustomer" parameterClass="java.util.HashMap" >
+					<![CDATA[
+						insert into filter_condition 
+									(id,deleted,customerGroup,groupId) 
+						value 
+									(REPLACE(uuid(),'-','') ,0,#customerGroup#,#groupId#)
+					]]>
+		</insert>
+	    <!-- 高客单价分组条件 -->
+		<insert id="insertHighBuyTotal" parameterClass="java.util.HashMap" >
+						<![CDATA[
+					insert into filter_condition 
+								(id,deleted,customerGroup,tradeAvePrice) 
+					value 
+								(REPLACE(uuid(),'-','') ,0,#customerGroup#,#tradeAvePrice#)
+					]]>
+	    </insert>
+	    <!-- 沉睡买家分组 -->
+		<insert id="insertSleepCustomer" parameterClass="java.util.HashMap" >
+				<![CDATA[
+					insert into filter_condition 
+								(id,deleted,customerGroup,minBuyAmountPrice,lastBuyTime) 
+					value 
+								(REPLACE(uuid(),'-','') ,0,#customerGroup#,#minBuyAmountPrice#,#lastBuyTime#)
+				]]>
+		</insert>
+		<!-- 最后购买区间 -->
+		<insert id="insertLastBuyTimeCustomer" parameterClass="java.util.HashMap" >
+				<![CDATA[
+					insert into filter_condition 
+								(id,deleted,customerGroup,lastBuyTime) 
+					value 
+								(REPLACE(uuid(),'-','') ,0,#customerGroup#,#lastBuyTime#)
+				]]>
+		</insert>
+	    <!-- 潜在会员分组 -->
+		<insert id="insertPotentialCustomer" parameterClass="java.util.HashMap" >
+				<![CDATA[
+					insert into filter_condition 
+								(id,deleted,customerGroup,buyNum) 
+					value 
+								(REPLACE(uuid(),'-','') ,0,#customerGroup#,#buyNum#)
+				]]>
+		</insert>
+		<select id="shopSumPrice" resultClass="java.lang.String"  parameterClass="string" >
+			<![CDATA[
+				select sum(payment) from trade where user='$value$' and status in('WAIT_SELLER_SEND_GOODS','WAIT_BUYER_CONFIRM_GOODS','TRADE_BUYER_SIGNED','TRADE_FINISHED')
+			]]>
+		</select>
+		
+		<select id="getSmsCount" resultClass="java.lang.String"  parameterClass="string" >
+			<![CDATA[ 
+				select count(*) from notify_sms 
+				where status in (2,3,108) and user='$value$' 
+			]]>
+		</select>
+		<select id="getRateCount" resultClass="java.lang.String"  parameterClass="string" >
+			<![CDATA[ 
+				select count(distinct(n.tid)) from notify_sms n, trade_rate t  where n.tid=t.tid  and t.result='good' and n.user='$value$' 
+			]]>
+		</select>
+	    <select id="getConfirmCount" resultClass="java.lang.String"  parameterClass="string" >
+	    	<![CDATA[ 
+	    	  select count(distinct(t.tid))  from notify_sms n,trade t 
+			  where  
+				n.tid=t.tid and n.user='$value$' 
+				 and (( n.type  = 108 and  t.endTime - n.sendtime < 3600*1000*24) or  ( n.type  = 104 and  t.endTime - n.sendtime < 3600*1000*48) )
+				 and t.endTime - n.sendtime >0 
+		 	]]>
+		</select>
+		<select id="getRetrunCount" resultClass="java.lang.String"  parameterClass="string" >
+			<![CDATA[
+					select count(distinct(t.tid)) from trade t left join (select s.tid,s.sendtime,t1.buyernick from notify_sms s,trade t1 where s.tid=t1.tid and t1.user='$value$') n  
+	  				on t.buyernick=n.buyernick where t.user='$value$' and t.created - n.sendtime<3600*1000*24*7 and t.created - n.sendtime>0
+	  	  	 ]]>
+		</select>
+		<select id="getBuyBadRate" resultClass="java.lang.String"  parameterClass="string" >
+			<![CDATA[
+					update buyer,(select user,nick,count(*) as count from trade_rate where role='buyer' and result='bad' and  user='$value$'  group by user,nick) as  u set   buyer.badrate=u.count where buyer.user='$value$'  and buyer.buyernick=u.nick
+	  	  	 ]]>
+		</select>
+		<select id="getBuyNeutralRate" resultClass="java.lang.String"  parameterClass="string" >
+			<![CDATA[
+				  update buyer,(select user,nick,count(*) as count from trade_rate where role='buyer' and result='neutral' and  user='$value$'  group by user,nick) as  u set   buyer.neutralRate=u.count  where buyer.user='$value$' and buyer.buyernick=u.nick
+	  	  	 ]]>
+		</select>
+		<!-- 获取未分析的会员 -->
+		<select id="getBuyerNewField" resultClass="java.lang.String"  parameterClass="string" >
+			<![CDATA[
+				select b.id,t.receiverName as buyername,t.receiverMobile as buyerMobile,t.receiverState as buyerState,t.receiverCity as buyerCity,t.status ,t.created,t.receiverPhone
+				from (select buyernick,id  from buyer where user='$value$'  and deal=0  limit 1000) b left JOIN trade t ON t.user='$value$'  and b.buyerNick=t.buyernick order by b.buyernick,t.created limit 9999
+	  	  	 ]]>
+		</select>
+				<!-- 获取没有会员的订单 -->
+		<select id="getMissBuyernick" resultClass="java.lang.String"  parameterClass="java.util.HashMap" >
+			<![CDATA[
+				select distinct(t.buyernick) from trade  t left JOIN buyer b on t.buyerNick=b.buyerNick and b.user=#user# where t.user=#user#  and t.created>#startDate# and t.created<#endDate#  and t.created>1230739200000  and t.status in ('TRADE_FINISHED','TRADE_CLOSED')  and b.id is null limit 8888 
+	  	  	 ]]>
+		</select>		
+		<!-- 根据订单号获取新增订单信息(并且无会员) -->
+		<select id="getNewNoBuyerTrade" resultClass="java.lang.String"  parameterClass="java.util.HashMap" >
+			<![CDATA[
+				select t.buyerNick,t.status,t.created,t.payment,t.receiverMobile,t.receiverPhone,t.receiverState,t.receiverCity,t.receiverName,t.user from trade t,(select buyernick,user from trade t1 where  t1.tid=#tid#) t2 left join buyer  b on b.user=t2.user and b.buyernick=t2.buyernick and b.changeStatus=0  where t2.user=t.user and t.buyernick=t2.buyernick and b.id is null order by t.created
+			 ]]>
+		</select>		
+		<!-- 获取11年3月1号之前,少量无会员的订单 -->
+		<select id="getOldNoBuyerTrade" resultClass="java.lang.String"  parameterClass="java.util.HashMap" >
+			<![CDATA[
+				select t.buyerNick,t.status,t.created,t.payment,t.receiverMobile,t.receiverPhone,t.receiverState,t.receiverCity,t.receiverName,t.user from trade t  left join buyer  b on b.user=t.user and b.buyernick=t.buyernick where t.user=#user# and t.created <1296489600000 and t.created>10 and  b.id is null order by buyernick,created limit 5000
+			 ]]>
+		</select>		
+</sqlMap>

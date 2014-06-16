@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "sql-map-2.dtd">
+<sqlMap namespace="shomopcrm">
+	<typeAlias alias="BuyCyclistCount"  type="com.shomop.crm.model.BuyCyclistCount" />
+	<typeAlias alias="TodayInfo"  type="com.shomop.crm.model.TodayInfo" />
+	<typeAlias alias="Buyer" type="com.shomop.crm.model.Buyer" />
+	
+	<!-- 跟新会员周期 -->
+	<update id="updateBuyCyclistCount"   parameterClass="BuyCyclistCount">
+		<![CDATA[
+		 update Buy_Cyclist_Count set type=1
+		 ]]>
+		<isGreaterThan prepend =","  property ="B_0_7"  compareValue ="0">
+			B_0_7 = B_0_7 -1
+		</isGreaterThan>
+		<isGreaterThan prepend =","  property ="B_7_30"  compareValue ="0">
+			B_7_30 = B_7_30 -1
+		</isGreaterThan>
+		<isGreaterThan prepend =","  property ="B_30_60"  compareValue ="0">
+			B_30_60 = B_30_60 -1
+		</isGreaterThan>
+		<isGreaterThan prepend =","  property ="B_60_90"  compareValue ="0">
+			B_60_90 = B_60_90 -1
+		</isGreaterThan>
+		<isGreaterThan prepend =","  property ="B_90_MAX"  compareValue ="0">
+			B_90_MAX = B_90_MAX -1
+		</isGreaterThan>
+		<![CDATA[
+		where dateNum=#dateNum# and user=#user# and type=1
+		]]>
+	</update>
+	
+	<!-- 跟新最后购买次数,金额 -->
+	<update id="updateTodayInfo"   parameterClass="TodayInfo">
+			<![CDATA[
+		 update Today_Info set  type=1
+		 ]]>
+		 <isGreaterThan prepend =","  property ="lastBuyZeroCount"  compareValue ="0">
+			lastBuyZeroCount = lastBuyZeroCount -1
+		</isGreaterThan>
+		<isGreaterThan prepend =","  property ="lastBuyOneCount"  compareValue ="0">
+			lastBuyOneCount = lastBuyOneCount -1,lastBuyCount = lastBuyCount-1
+		</isGreaterThan>
+		<isGreaterThan prepend =","  property ="lastBuyTwoCount"  compareValue ="0">
+			lastBuyTwoCount = lastBuyTwoCount -1,lastBuyCount = lastBuyCount-1
+		</isGreaterThan>
+		<isGreaterThan prepend =","  property ="lastBuyThreeCount"  compareValue ="0">
+			lastBuyThreeCount = lastBuyThreeCount -1,lastBuyCount = lastBuyCount-1
+		</isGreaterThan>
+		<isGreaterThan prepend =","  property ="lastBuyFourCount"  compareValue ="0">
+			lastBuyFourCount = lastBuyFourCount -1,lastBuyCount = lastBuyCount-1
+		</isGreaterThan>
+		<isGreaterThan prepend =","  property ="lastBuyFiveCount"  compareValue ="0">
+			lastBuyFiveCount = lastBuyFiveCount -1,lastBuyCount = lastBuyCount-1
+		</isGreaterThan>
+		<isGreaterThan prepend =","  property ="lastBuyOnePrice"  compareValue ="0">
+			lastBuyOnePrice = lastBuyOnePrice - #lastBuyOnePrice#
+		</isGreaterThan>
+		<isGreaterThan prepend =","  property ="lastBuyTwoPrice"  compareValue ="0">
+			lastBuyTwoPrice = lastBuyTwoPrice - #lastBuyTwoPrice#
+		</isGreaterThan>
+		<isGreaterThan prepend =","  property ="lastBuyThreePrice"  compareValue ="0">
+			lastBuyThreePrice = lastBuyThreePrice - #lastBuyThreePrice#
+		</isGreaterThan>
+		<isGreaterThan prepend =","  property ="lastBuyFourPrice"  compareValue ="0">
+			lastBuyFourPrice = lastBuyFourPrice - #lastBuyFourPrice#
+		</isGreaterThan>
+		<isGreaterThan prepend =","  property ="lastBuyFivePrice"  compareValue ="0">
+			lastBuyFivePrice = lastBuyFivePrice - #lastBuyFivePrice#
+		</isGreaterThan>
+		<![CDATA[
+			where dateNum=#dateNum# and user=#user# and type=1
+		]]>
+	</update>
+		<select id="updateTodayInfoActivateBuyerCount" resultClass="java.lang.String"  parameterClass="string" >
+			<![CDATA[
+				 update today_info b,(select count(*) as num,cast((paytime-14400000)/86400000 as unsigned  int)  as datenum  from (select  max(paytime) as paytime,r.buyernick from reward_detail r,buyer b1 where b1.user='$value$'  and r.user='$value$'  and b1.buyernick=r.buyernick and b1.buynum>1  group by r.buyernick ) a  group by datenum) c set b.activateBuyerCount=c.num where b.user='$value$'  and b.dateNum=c.datenum
+	  	  	 ]]>
+		</select>
+		<select id="updateBuyerActivateTime" resultClass="java.lang.String"  parameterClass="java.util.HashMap" >
+			<![CDATA[
+				update buyer b,(select  max(paytime) as paytime,buyernick from reward_detail where user=#user#  group by buyernick) c set b.lastActivateTime=paytime where b.user=#user#   and b.buyernick=c.buyernick and b.buynum>1 and paytime<#endTime#
+			]]>
+		</select>
+	</sqlMap>

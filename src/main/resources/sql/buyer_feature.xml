@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 会员属性（地域、等级）分析 -->
+<sqlMap namespace="buyerFeatureMapping">
+
+	<typeAlias alias="Residence" type="com.shomop.crm.model.Residence" />
+	<typeAlias alias="Buyer" type="com.shomop.crm.model.Buyer" />
+   
+ 	<!-- 查询地域的返回字段 -->
+    <sql id="residenceFields">select id,user,province,tradeNum,amount,buyerNum,familiarBuyerNum,familiarTradeNum,familiarAmount from residence</sql>
+    
+    <!-- 查询buyer的返回字段 -->
+    <sql id="buyerFields">select id,grade,buyerNick,buyNum,lastBuyTime,buyAmountPrice,buyerMobile,buyerId from buyer </sql>
+    
+    <!-- 查询付款订单 alias "t" -->
+    <sql id="queryPayTrade">
+	 <isParameterPresent>
+	    <isNotEmpty prepend="and" property="user">
+	         <![CDATA[t.user=#user#]]>
+	    </isNotEmpty>
+		<isPropertyAvailable prepend="and" property="payTime" 
+			open="(" close=")" removeFirstPrepend="true">
+		    <isNotNull property="payTime">
+			     <![CDATA[t.payTime !='']]>
+			</isNotNull>
+			<isNotEmpty prepend="and" property="startPayTime">
+				 <![CDATA[t.payTime >= $startPayTime$]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="endPayTime">
+			     <![CDATA[t.payTime <= $endPayTime$]]>
+			</isNotEmpty>
+		</isPropertyAvailable>
+		<isPropertyAvailable prepend="and" property="created"  
+			open="("  close=")" removeFirstPrepend="true">
+			<isNotNull property="created">
+			     <![CDATA[t.created !='']]>
+			</isNotNull>
+			<isNotEmpty prepend="and" property="startCreatedTime">
+				<![CDATA[t.created >= $startCreatedTime$]]>
+			</isNotEmpty>
+			<isNotEmpty  prepend="and" property="endCreatedTime">
+				<![CDATA[t.created <= $endCreatedTime$]]>
+			</isNotEmpty>
+		</isPropertyAvailable>
+	 </isParameterPresent>
+    </sql>
+   
+    <!-- 查询地域分析结果 -->
+	<select id="getResidenceByParam" resultClass="Residence" parameterClass="java.util.HashMap">
+		 <include refid="residenceFields"/>
+		 <dynamic prepend="where">
+		  <isParameterPresent>
+		    <isNotEmpty prepend="and" property="user">
+				user=#user#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="dayTime" >
+				dayTime=$dayTime$
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="province">
+			   province=#province#
+			</isNotEmpty>
+		  </isParameterPresent>
+		</dynamic>
+	</select>
+    
+   <!-- 每天的会员地域分析
+   <select id="analyzeBuyerResidenceInfoByTime"  parameterClass="java.util.HashMap">
+    <![CDATA[
+      select t1.tradeNum,cast(t1.amount*100 as SIGNED) as amount,t1.buyerNum,IFNULL(t2.tradeNum,0) as familiarTradeNum,cast(IFNULL(t2.amount*100,0) as SIGNED) as familiarAmount,IFNULL(t2.buyerNum,0) as familiarBuyerNum,t1.receiverState from  
+      (select count(tid) as tradeNum,sum(payment) as amount,count(DISTINCT buyerNick) as buyerNum,receiverState from trade where payTime != '' and (created BETWEEN $startTime$ AND $endTime$) and user=#user# GROUP BY receiverState) t1 
+      LEFT JOIN (select count(tid) as tradeNum,sum(payment) as amount,count(DISTINCT buyerNick) as buyerNum,receiverState from trade where buyNum > 1 and payTime !='' and (created BETWEEN $startTime$ AND $endTime$) and user=#user# 
+      GROUP BY receiverState) t2 on t1.receiverState = t2.receiverState
+     ]]>
+    </select> -->
+    
+    <!-- 每天的会员地域分析 -->
+    <select id="analyzeBuyerResidenceInfoByTime" parameterClass="map">
+      <![CDATA[select t1.dayTime,t1.receiverState,t1.tradeNum,cast(t1.amount*100 as SIGNED) as amount,t1.buyerNum,IFNULL(t2.tradeNum,0) as familiarTradeNum,cast(IFNULL(t2.amount*100,0) as SIGNED) as familiarAmount,IFNULL(t2.buyerNum,0) as familiarBuyerNum from  
+      (select count(tid) as tradeNum,sum(payment) as amount,count(DISTINCT buyerNick) as buyerNum,receiverState,FROM_UNIXTIME(created/1000,'%Y-%m-%d') as dayTime from trade where payTime != '' and (created BETWEEN $startTime$ AND $endTime$) and user=#user# GROUP BY dayTime,receiverState) t1  
+      LEFT JOIN (select count(tid) as tradeNum,sum(payment) as amount,count(DISTINCT buyerNick) as buyerNum,receiverState,FROM_UNIXTIME(created/1000,'%Y-%m-%d') as dayTime from trade where buyNum > 1 and payTime !='' and (created BETWEEN $startTime$ AND $endTime$) and user=#user# 
+      GROUP BY dayTime,receiverState) t2 on t1.dayTime=t2.dayTime and t1.receiverState=t2.receiverState]]>
+    </select>
+    
+    <!-- 首次分析会员等级（每个会员的数据依据淘宝）
+    <select id="analysizeAllCrmMemberGradeOverview" parameterClass="java.util.HashMap">
+      <![CDATA[select count(buyerNick) as allMemberCount,count(CASE WHEN taobaoBuyNum>0 THEN 1 END) as memberCount,sum(taobaoBuyAmountPrice) as totalMonetary,sum(taobaoBuyNum) as totalFrequency,ROUND(sum($deadline$-lastBuyTime)/86400000,0) as totalRecency,grade from buyer where user=#user# GROUP BY grade]]>
+    </select> -->
+    
+     <!-- 首次分析会员等级（每个会员的数据依据会员分析数据） -->
+    <select id="analysizeAllCrmMemberGradeOverview" parameterClass="java.util.HashMap">
+      <![CDATA[select count(buyerNick) as allMemberCount,count(CASE WHEN buyNum>0 THEN 1 END) as memberCount,COALESCE(sum(buyAmountPrice),0) as totalMonetary,COALESCE(sum(buyNum),0) as totalFrequency,COALESCE(ROUND(sum($deadline$-lastBuyTime)/86400000,0),0) as totalRecency,grade from buyer where user=#user# GROUP BY grade]]>
+    </select>
+    
+    <!-- 统计会员人数 -->
+    <select id="getMemberCount" parameterClass="HashMap">
+     <![CDATA[ select count(*) as total from buyer]]>
+     <dynamic prepend="where">
+       <isParameterPresent>
+        <isNotEmpty prepend="and" property="user">
+            <![CDATA[user=#user#]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="grade">
+            <![CDATA[grade=$grade$]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="buyNum">
+           <![CDATA[buyNum=$buyNum$]]>
+        </isNotEmpty>
+		<isNotEmpty prepend="and" property="startLastBuyTime">
+		   <![CDATA[lastBuyTime >= $startLastBuyTime$]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endLastBuyTime">
+		   <![CDATA[lastBuyTime <= $endLastBuyTime$]]>
+	    </isNotEmpty>
+       </isParameterPresent>  
+     </dynamic>
+    </select>
+    
+    <!-- 昨天新增订单会员信息 必须先等级、nick排序-->
+    <select id="getCrmMemberConsumptionByTime" parameterClass="HashMap">
+     <![CDATA[select b.grade,t.buyerNick,count(t.tid) as lastDayBuyNum,ROUND(sum(payment)*100,0) as lastDayAmount,b.lastBuyTime,b.buyNum from trade t INNER JOIN buyer b on t.user=b.user ]]>
+      <dynamic prepend="where">
+        <include refid="queryPayTrade"/>
+        <![CDATA[and t.buyerNick = b.buyerNick and t.status !='TRADE_CLOSED' GROUP BY b.grade,t.buyerNick]]>
+      </dynamic>
+    </select>
+    
+    <!--等级变化的会员-->
+    <select id="getModifiedCrmMemberByNicks" parameterClass="HashMap">
+      <include refid="buyerFields"/>
+      <dynamic prepend="where">
+       <isNotEmpty property="grade" prepend="and">
+         <![CDATA[grade != $grade$]]>
+       </isNotEmpty>
+        <isNotEmpty property="nicks" prepend="and">
+         <![CDATA[buyerNick in ($nicks$)]]>
+       </isNotEmpty>
+        <isNotEmpty property="user" prepend="and">
+         <![CDATA[user=#user#]]>
+       </isNotEmpty>
+       <![CDATA[and lastBuyTime is not null]]>
+      </dynamic>
+    </select>
+    
+   <!-- 更新会员top返回变化属性 -->
+   <update id="updateBuyerByTopInfo" parameterClass="Buyer">
+      <![CDATA[update buyer]]>
+      <isParameterPresent prepend="set" removeFirstPrepend="true">
+        <isGreaterEqual prepend="," property="grade" compareProperty="exGrade">
+        grade=$grade$
+        </isGreaterEqual>
+        <isGreaterThan prepend="," property="taobaoBuyNum" compareValue="0">
+        taobaoBuyNum=$taobaoBuyNum$
+        </isGreaterThan>
+        <isGreaterThan prepend="," property="taobaoBuyAmountPrice" compareValue="0">
+        taobaoBuyAmountPrice=$taobaoBuyAmountPrice$
+        </isGreaterThan>
+        <isNotEmpty property="taobaoLastBuyTimes" prepend=",">
+        taobaoLastBuyTime=$taobaoLastBuyTimes$
+        </isNotEmpty>
+        <isNotEmpty property="groupIds" prepend=",">
+        groupIds=#groupIds#
+        </isNotEmpty>
+        <isNotEmpty property="deal" prepend=",">
+        deal=$deal$
+        </isNotEmpty>
+        <isLessEqual prepend="," property="exGrade" compareProperty="grade">
+        exGrade=$exGrade$
+        </isLessEqual>
+        <isGreaterThan property="relationSource" prepend="," compareValue="0">
+        relationSource=$relationSource$
+        </isGreaterThan>
+        <isGreaterThan property="lastUpgradeTime" prepend="," compareValue="0">
+        lastUpgradeTime=$lastUpgradeTime$
+        </isGreaterThan>
+      </isParameterPresent>
+      <![CDATA[where id=#id#]]>
+   </update>
+    
+    <!-- 今天生日的用户 -->
+    <select id="getTodayIsBirthdayBuyer" parameterClass="map">
+      <![CDATA[select buyerName,buyerNick,buyNum,buyAmountPrice,buyerMobile,buyerId,birthday from buyer]]>
+       <dynamic prepend="where">
+        <isNotNull prepend="and" property="user">
+         user=#user#
+        </isNotNull>
+        <isNotNull prepend="and" property="month">
+          month(from_unixTime(birthday/1000))=$month$
+        </isNotNull>
+        <isNotNull prepend="and" property="day">
+          day(from_unixTime(birthday/1000))=$day$
+        </isNotNull>
+        <isNull prepend="and" property="birthday">
+       	<![CDATA[birthday > 0]]>
+        </isNull>
+       </dynamic>
+    </select>
+    
+    <!-- 删除指定用户的等级分析结果 -->
+    <delete id="deleteGradeOverviewOfUser" parameterClass="map">
+      <![CDATA[delete from grade_overview]]>
+      <dynamic prepend="where">
+       <isNotEmpty prepend="and" property="user">
+         user=#user#
+       </isNotEmpty>
+       <isNotEmpty prepend="and" property="updateTime">
+         updateTime=$updateTime$
+       </isNotEmpty>
+      </dynamic>
+    </delete>
+    
+    
+    <select id="testDynamic" parameterClass="HashMap">
+      select * from Residence
+      <dynamic prepend="where">
+      <isParameterPresent open="(" close=")">
+         <isGreaterEqual prepend="and" compareProperty="dayTime" compareValue="18">
+           dayTime=$dayTime$
+         </isGreaterEqual>
+         <isGreaterEqual prepend="and" compareProperty="test" compareValue="18">
+           test=$test$
+        </isGreaterEqual>
+        </isParameterPresent>
+        <include refid="queryPayTrade"/>
+      </dynamic>
+    </select>
+
+</sqlMap>
