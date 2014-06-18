@@ -2,6 +2,7 @@ package com.shomop.crm.model;
 
 import java.util.Date;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,7 +16,8 @@ import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "user")
-@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)// 表示开启二级缓存，并使用read-only策略
+@Cache(usage = CacheConcurrencyStrategy.READ_ONLY) // 表示开启二级缓存，并使用read-only策略
+//@Cacheable 开启查询缓存
 public class User implements Identifier<String>, Cloneable {
 
 	private String id;

@@ -36,7 +36,9 @@ public class UserTest extends BaseTestCase {
          */
 		Query query = session.createQuery("from User");
 		List<User> users = (List<User>) query.list();
+		System.out.println(users.size());
         User user = (User)session.load(User.class, "00065702C8364CFBAD54A61B2AEE5CF8");
+        System.out.println(user.getUsername()+"------------");
 	    }catch (Exception e){
             e.printStackTrace();
         }
@@ -54,12 +56,18 @@ public class UserTest extends BaseTestCase {
 	
 	/**
 	 * 二级缓存是sessionFactory级别的缓存
+	 * 二级缓存也是缓存实体对象 ，其实现原理与一级缓存的差不多，其方法与一级的相同，只是缓存的生命周期不一样而已
 	 * 因为二级缓存是sessionFactory级别的缓存，在配置了二级缓存以后，当session关闭以后，
 	 * 再去查询对象的时候，此时hibernate首先会去二级缓存中查询是否有该对象，有就不会再发sql了。
 	 * 二级缓存缓存的仅仅是对象，如果查询出来的是对象的一些属性，则不会被加到缓存中去
 	 * 
 	 * Iterator<User> iterator = session.createQuery("from User").iterate();
 	 * 通过二级缓存来解决 N+1 的问题
+	 * 
+	 * 当用户根据id查询对象的时候(load、iterator方法)，会首先在缓存或者二级缓存中查找，如果没有找到再发起数据库查询。
+	 * 但是如果使用hql发起查询(query)则不会利用二级缓存，而是直接从数据库获得数据，但是它会把得到的数据放到二级缓存备用。
+	 * 也就是说，基于hql的查询，对二级缓存是只写不读的。
+	 * 
 	 */
 	//@Test
 	public void testCache2() {
@@ -101,6 +109,7 @@ public class UserTest extends BaseTestCase {
         List<Object[]> ls = (List<Object[]>) session
                 .createQuery("select id,username from User user")
                 .setFirstResult(0).setMaxResults(30).list();
+        System.out.println(ls.size());
 	}
 
 	
@@ -109,6 +118,10 @@ public class UserTest extends BaseTestCase {
 	 * 但是我们看到发出了两条相同的查询语句，这是因为二级缓存不会缓存我们的hql查询语句，
 	 * 要想解决这个问题，我们就要配置我们的查询缓存了
 	 * hibernate.cache.use_query_cache <code>true</code>
+	 * 查询缓存的实现机制与二级缓存基本一致，最大的差异在于放入缓存中的key是查询的语句，value是查询之后得到的结果集的id列表。
+	 * 另外一个需要注意的问题是，查询缓存和二级缓存是有关联关系的，他们不是完全独立的两套东西。
+	 * 假如一个查询条件hql_1，第一次被执行的时候，它会从数据库取得数据，然后把查询条件作为key，
+	 * 把返回数据的所有id列表作为value(请注意仅仅是id)放到查询缓存中，同时整个结果集放到class缓存(也就是二级缓存)，key是id，value是pojo对象。
 	 * 
 	 * 
 	 * 查询缓存也是sessionFactory级别的缓存
@@ -122,7 +135,7 @@ public class UserTest extends BaseTestCase {
 	 * 所以，如果要使用查询缓存，我们一定也要开启我们的二级缓存，这样就不会出现 N+1 问题了
 	 * 
 	 */
-	@Test
+	//@Test
 	public void testQueryCache() {
 		Session session = null;
 		try {
@@ -131,7 +144,7 @@ public class UserTest extends BaseTestCase {
 			 */
 			session = getCurrentSession();
 			List<User> ls = session.createQuery("from User").setCacheable(true) // 开启查询缓存
-					.setFirstResult(0).setMaxResults(50).list();
+					.setFirstResult(0).setMaxResults(10).list();
 			Iterator<User> users = ls.iterator();
 			for (; users.hasNext();) {
 				User user = users.next();
@@ -144,11 +157,11 @@ public class UserTest extends BaseTestCase {
 		}
 		try {
 			/**
-			 * 此时会发出一条sql取出所有的用户信息
+			 * 此时只会发出一条sql取出所有的用户信息
 			 */
 			session = sessionFactory.openSession();
-			List<User> ls = session.createQuery("from User").setCacheable(true) // 开启查询缓存
-					.setFirstResult(0).setMaxResults(50).list();
+			List<User> ls = session.createQuery("from User").setCacheable(true) // 启用查询缓存
+					.setFirstResult(0).setMaxResults(10).list();
 			Iterator<User> users = ls.iterator();
 			for (; users.hasNext();) {
 				User user = users.next();
@@ -159,6 +172,27 @@ public class UserTest extends BaseTestCase {
 		} finally {
 			session.close();
 		}
+	}
+	
+	/**
+	 * 查询缓存是针对普通属性结果集的缓存，对实体对象的结果集只缓存id（其ID不是对象的真正ID，它与查询的条件
+	 * 相关即where后的条件相关，不同的查询条件，其缓存的id也不一样） ，查询缓存的生命周期，当前关联的表发生修改
+	 * 或是查询条件改变时，那么查询缓存生命周期结束，它不受一级缓存 和二级缓存的生命周期的影响
+	 */
+	@Test
+	public void testQueryCache2(){
+		Session session = sessionFactory.openSession();
+		List<Object[]> ls = (List<Object[]>)session.createQuery("select id,username from User").setCacheable(true)
+				.list();
+		System.out.println(ls.get(0)[0]+"---------------------");
+		session.close();
+		
+		// 因为 HQL 不一样，所以，用不到查询缓存
+		session = sessionFactory.openSession();
+		List<Object[]> ls2 = (List<Object[]>)session.createQuery("select id,username from User").setCacheable(true)
+				.list();
+		System.out.println(ls2.get(0)[0]+"---------------------");
+		session.close();
 	}
 	
 }
