@@ -16,7 +16,6 @@
 	<context:annotation-config />
 	<context:component-scan base-package="com.shomop" />
 
-
 	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close">
 		<property name="driverClass" value="${jdbc.driverClass}" />
@@ -45,6 +44,13 @@
 				<prop key="hibernate.max_fetch_depth">${hibernate.max_fetch_depth}</prop>
 				<prop key="hibernate.jdbc.batch_size">${hibernate.jdbc.batch_size}</prop>
 				<prop key="hibernate.jdbc.fetch_size">${hibernate.jdbc.fetch_size}</prop>
+				<prop key="hibernate.cache.use_query_cache">true</prop>
+				<!-- 开启二级缓存 -->
+				<prop key="hibernate.cache.use_second_level_cache">true</prop>
+				<!-- 二级缓存的提供类 在hibernate4.0版本以后我们都是配置这个属性来指定二级缓存的提供类 -->
+				<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>
+				<!-- 二级缓存配置文件的位置 -->
+				<prop key="hibernate.cache.provider_configuration_file_resource_path">classpath:/ehcache.xml</prop>
 			</props>
 		</property>
 		<property name="packagesToScan">
@@ -54,41 +60,23 @@
 		</property>
 
 	</bean>
-
+	
+    <!-- 配置事务管理器 -->  
 	<bean id="txManager"
 		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
-
+	
+	
+	<!-- XML AOP事务管理  -->
 	<!-- 强制使用CGLIB代理 -->
 	<aop:config proxy-target-class="true">
 		<aop:pointcut id="bussinessService"
 			expression="execution(public * com.shomop.crm.service..*.*(..))" />
 		<aop:advisor pointcut-ref="bussinessService" advice-ref="txAdvice" />
 	</aop:config>
-
-	<aop:config>
-		<aop:advisor id="methodTimeLog" advice-ref="methodTimeAdvice"
-			pointcut="execution(public * com.shomop.crm.service..*.*(..))" />
-	</aop:config>
-
- <bean id="anotationInterceptor"
-           class="com.shomop.log.taskLog.AnotationInterceptor"/>
-    <!--配置拦截器和bean-->
-    <bean id="anotationThresholdInterceptorCreator"
-           class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
-        <property name="beanNames">
-            <list>
-                 <value>cccj</value>
-            </list>
-        </property>
-        <property name="interceptorNames">
-            <list>
-                <value>anotationInterceptor</value>
-            </list>
-        </property>
-    </bean>
-    
+	
+	<!-- 配置事务的传播特性 --> 
 	<tx:advice id="txAdvice" transaction-manager="txManager">
 		<tx:attributes>
 			<tx:method name="save*" propagation="REQUIRED" />
@@ -101,20 +89,8 @@
 			<tx:method name="*" read-only="true" />
 		</tx:attributes>
 	</tx:advice>
-	<bean id="DbName" class="com.shomop.connect.server.DbName">
-		<property name="nodePort"
-			value="${nodePort}" />
-		<property name="orderPort"
-			value="${orderPort}" />
-	</bean>
-
-	<bean id="methodTimeAdvice" class="com.shomop.log.MethodLog" />
-	<!-- ibatis 
-	<bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
-		<property name="configLocation"
-			value="sql/SqlMapConfig.xml" />
-		<property name="dataSource" ref="dataSource" />
-	</bean>-->
-	<!-- statistics 
-	<import resource="spring_cron.xml" />-->
+	
+	<!-- 注解事务 
+    <tx:annotation-drive transaction-manager="txManager"/>
+    <aop:aspectj-autoproxy proxy-target-class="true"/> -->
 </beans>
