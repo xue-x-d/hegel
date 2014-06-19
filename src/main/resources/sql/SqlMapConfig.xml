@@ -7,10 +7,4 @@
 		lazyLoadingEnabled="false" maxRequests="3000" maxSessions="3000"
 		maxTransactions="3000" useStatementNamespaces="false" />
 		
-	<sqlMap resource="sql/buyer.xml"/>
-	<sqlMap resource="sql/notify.xml"/>
-	<sqlMap resource="sql/data.xml"/>
-	<sqlMap resource="sql/marketing_statistic.xml"/>
-	<sqlMap resource="sql/buyer_feature.xml"/>
-	<sqlMap resource="sql/item.xml"/>
 </sqlMapConfig>  

@@ -8,13 +8,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.transaction.TransactionConfiguration;
-
+/**
+ * 带事务环境的测试基类
+ * @author spencer.xue
+ * @date 2014-6-19
+ */
 @ContextConfiguration(locations = "classpath:/application.xml")
 @TransactionConfiguration(defaultRollback = true)
 public class BaseTestCase extends AbstractTransactionalJUnit4SpringContextTests {
 	// applicationContext
 	// logger
-	// dbcTemplate
+	// jdbcTemplate
 	
 	private static boolean inited = false;
 
@@ -39,10 +43,10 @@ public class BaseTestCase extends AbstractTransactionalJUnit4SpringContextTests 
 	}
 	
 	@Autowired
-	protected SessionFactory sessionFactory;
+	private SessionFactory sessionFactory;
 	
     /**
-     * available to subclasses.
+     * for hibernate save
      */
 	protected void flushSession() {
 		Session session = sessionFactory.getCurrentSession();
@@ -51,9 +55,21 @@ public class BaseTestCase extends AbstractTransactionalJUnit4SpringContextTests 
 		}
 	}
 	
+	/**
+	 * This session is managed by spring framework.
+	 */
 	protected Session getCurrentSession(){
 		
 		return sessionFactory.getCurrentSession();
+	}
+	
+	/**
+	 * if you need more session in one method test
+	 * and you should close session which get by this method
+	 */
+	protected Session openSession(){
+		
+		return sessionFactory.openSession();
 	}
 	
 }
