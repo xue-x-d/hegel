@@ -5,7 +5,7 @@
   <groupId>com.shomop.crm</groupId>
   <artifactId>jd-service</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
 
   <name>jd-service</name>
   <url>http://maven.apache.org</url>
@@ -18,6 +18,7 @@
     <gen.src.dir>${basedir}/target/thrift</gen.src.dir>
     <gen.java.src.dir>${gen.src.dir}/gen-java</gen.java.src.dir>
     <gen.nodejs.src.dir>${gen.src.dir}/gen-nodejs</gen.nodejs.src.dir>
+    <spring.version>3.2.2.RELEASE</spring.version>
   </properties>
 
   <build>
@@ -98,21 +99,52 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-core</artifactId>
+		<version>${spring.version}</version>
+		<exclusions>
+			<exclusion>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging</artifactId>
+			</exclusion>
+		</exclusions>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-beans</artifactId>
+		<version>${spring.version}</version>
+	</dependency>
+    <dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-web</artifactId>
+		<version>${spring.version}</version>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-webmvc</artifactId>
+		<version>${spring.version}</version>
+	</dependency>
     <dependency>
        <groupId>org.springframework</groupId>
        <artifactId>spring-test</artifactId>
-       <version>3.2.2.RELEASE</version>
+       <version>${spring.version}</version>
        <scope>test</scope>
      </dependency>
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-context</artifactId>
+		<version>${spring.version}</version>
+	</dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context-support</artifactId>
-      <version>3.2.2.RELEASE</version>
+      <version>${spring.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-orm</artifactId>
-      <version>3.2.2.RELEASE</version>
+      <version>${spring.version}</version>
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
@@ -224,5 +256,32 @@
 		<artifactId>slf4j-api</artifactId>
 		<version>1.6.1</version>
 	</dependency>
+	<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+	</dependency>
+	<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>2.1</version>
+			<scope>provided</scope>
+	</dependency>
+	<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>jstl</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.1.2</version>
+		</dependency>
+	<dependency>
+      <groupId>com.taobao.api</groupId>
+      <artifactId>taobao-sdk</artifactId>
+      <version>20140519</version>
+    </dependency>
    </dependencies>
 </project>

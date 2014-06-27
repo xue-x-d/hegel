@@ -2,6 +2,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
            http://www.springframework.org/schema/context
@@ -9,11 +10,16 @@
            http://www.springframework.org/schema/aop
            http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
            http://www.springframework.org/schema/tx 
-           http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+           http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+           http://www.springframework.org/schema/mvc   
+           http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
 
 	<context:property-placeholder location="classpath:develop/*.properties" />
 
 	<context:annotation-config />
+	
+	<mvc:annotation-driven />  
+	
 	<context:component-scan base-package="com.shomop" />
 
 	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
@@ -44,7 +50,6 @@
 				<prop key="hibernate.max_fetch_depth">${hibernate.max_fetch_depth}</prop>
 				<prop key="hibernate.jdbc.batch_size">${hibernate.jdbc.batch_size}</prop>
 				<prop key="hibernate.jdbc.fetch_size">${hibernate.jdbc.fetch_size}</prop>
-				<prop key="hibernate.cache.use_query_cache">true</prop>
 			</props>
 		</property>
 		<property name="packagesToScan">
@@ -52,7 +57,6 @@
 				<value>com.shomop.crm.model</value>
 			</list>
 		</property>
-
 	</bean>
 	
     <!-- 配置事务管理器 -->  
@@ -84,7 +88,21 @@
 		</tx:attributes>
 	</tx:advice>
 	
-	<!-- 注解事务 
-    <tx:annotation-drive transaction-manager="txManager"/>
-    <aop:aspectj-autoproxy proxy-target-class="true"/> -->
+	<!-- 注解事务
+    <tx:annotation-driven transaction-manager="txManager" proxy-target-class="true" />
+     -->
+    <!-- 使用xml配置事务 -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+    <!-- <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />  --> 
+    <!-- 启动Spring MVC的注解功能，完成请求和注解POJO的映射 -->
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter" />
+	
+    <!-- ViewResolver -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+	    <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+	    <property name="prefix" value="/WEB-INF/jsp/"/>
+	    <property name="suffix" value=".jsp"/>
+	</bean>
+	    
+    
 </beans>
