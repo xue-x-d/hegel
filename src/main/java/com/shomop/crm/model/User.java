@@ -8,11 +8,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "user")
+@Cache(usage = CacheConcurrencyStrategy.READ_ONLY) // 表示开启二级缓存，并使用read-only策略
 public class User implements Identifier<String>, Cloneable {
 
 	private String id;

@@ -14,18 +14,24 @@ public class Digest {
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			md.update(message.getBytes());
-			byte b[] = md.digest();
+			byte result[] = md.digest();
 			StringBuffer buf = new StringBuffer();
-			for (int i = 0; i < b.length; i++) {
-				if (b[i] < 16){
+			for (byte b : result) {
+				int t = b & 0xff;
+				if (t < 16){
 					buf.append("0");
 				}
-				buf.append(Integer.toHexString(i));
+				buf.append(Integer.toHexString(t));
 			}
 			return buf.toString();
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
 		return "";
+	}
+	public static void main(String[] args) {
+		// fffffffa
+		// fffffffa
+		System.out.println(Integer.toHexString((byte)250));
 	}
 }

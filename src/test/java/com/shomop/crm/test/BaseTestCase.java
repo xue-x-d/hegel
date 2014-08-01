@@ -20,7 +20,7 @@ public class BaseTestCase extends AbstractTransactionalJUnit4SpringContextTests 
 	// logger
 	// jdbcTemplate
 	
-	private static boolean inited = false;
+	private static volatile boolean inited = false;
 
 	@BeforeClass
 	public static void init() {
@@ -43,7 +43,7 @@ public class BaseTestCase extends AbstractTransactionalJUnit4SpringContextTests 
 	}
 	
 	@Autowired
-	private SessionFactory sessionFactory;
+	protected SessionFactory sessionFactory;
 	
     /**
      * for hibernate save
@@ -65,7 +65,7 @@ public class BaseTestCase extends AbstractTransactionalJUnit4SpringContextTests 
 	
 	/**
 	 * if you need more session in one method test
-	 * and you should close session which get by this method
+	 * and you must to close session which get by this method
 	 */
 	protected Session openSession(){
 		

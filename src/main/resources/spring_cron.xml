@@ -262,6 +262,7 @@
 			</list>
 		</property>
 		<property name="taskExecutor" ref="taskExecutor" />
+		<property name="autoStartup" value="false"></property>
 	</bean>
 	
 </beans>

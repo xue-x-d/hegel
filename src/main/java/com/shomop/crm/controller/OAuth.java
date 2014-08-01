@@ -2,9 +2,8 @@ package com.shomop.crm.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,16 +35,16 @@ public class OAuth {
 	
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	
-	private static final String APP_ID = "2100002437";
+	private static final String APP_ID = "XXXXX";
 	
-	private static final String APP_SECRET = "2674D8281B40C0510ECC8CFF633492E7";
+	private static final String APP_SECRET = "XXXXX";
 	
 	private static final String AUTH_CODE_URL_PREFIX = "http://oauth.dangdang.com/authorize?";
 	
 	private static final String AUTH_TOKEN_URL_PREFIX = "http://oauth.dangdang.com/token?";
 	
 	// 对于Server-side flow，redirect_uri是必选参数，并且要求redirect_uri与callback的顶级域名一致。
-	private static final String REDIRECT_URL = "http://125.119.159.230:9090/jd-service/oauth/callback";
+	private static final String REDIRECT_URL = "http://115.239.210.27:9090/jd-service/oauth/callback";
 	
 	private static final Map<String,String> req_params = new HashMap<String,String>();
 	
@@ -170,16 +169,11 @@ public class OAuth {
 		params.append("edition_end_date").append(editionEndDate);
 		
 		params.append(APP_SECRET);
-		try {
-			String sign = Digest.md5(URLEncoder.encode(params.toString(),"UTF-8"));
-			return sign.equals(result.get("sign"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		return false;
+		String sign = Digest.md5(new String(params.toString().getBytes(),Charset.forName("UTF-8")));
+		return sign.equals(result.get("sign"));
 	}
 	
-     public static void main(String[] args) {
+    public static void main(String[] args) {
 	    
 	}
 	
