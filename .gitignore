@@ -5,7 +5,10 @@
 /node_modules
 
 /.settings
+
 /logs_notify
-/.project
+
+
 /.classpath
+
 /.project
