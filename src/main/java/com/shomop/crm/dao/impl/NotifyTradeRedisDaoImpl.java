@@ -9,6 +9,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
+import com.shomop.crm.common.cache.CacheException;
 import com.shomop.crm.common.cache.RedisCacheImpl;
 import com.shomop.crm.model.notify.DDNotifyTrade;
 
@@ -26,8 +27,8 @@ public class NotifyTradeRedisDaoImpl extends RedisCacheImpl<String,DDNotifyTrade
 			public Boolean doInRedis(RedisConnection connection)
 					throws DataAccessException {
 				byte[] _key = getDefaultRedisSerializer().serialize(key);
-				String value = getJsonRedisSerializer().seriazile(ntrade);
-				byte[] _value = getDefaultRedisSerializer().serialize(value);
+				byte[] _value = getJsonRedisSerializer().serialize(ntrade);
+				System.out.println("put value "+new String(_value));
 				return connection.setNX(_key, _value);
 			}
 		});
@@ -37,8 +38,9 @@ public class NotifyTradeRedisDaoImpl extends RedisCacheImpl<String,DDNotifyTrade
      * 通过key获取 
      * @param keyId 
      * @return 
+	 * @throws CacheException 
      */  
-    public DDNotifyTrade get(final String key) { 
+    public DDNotifyTrade get(final String key) throws CacheException { 
 		if (key == null) {
 			return null;
 		}
@@ -47,11 +49,10 @@ public class NotifyTradeRedisDaoImpl extends RedisCacheImpl<String,DDNotifyTrade
                     throws DataAccessException {  
                 RedisSerializer<String> serializer = getDefaultRedisSerializer();  
                 byte[] value = connection.get(serializer.serialize(key));
-                System.out.println(new String(value));
-                return getJsonRedisSerializer().deserialize(value,getType()); 
+                return getJsonRedisSerializer().deserialize(value);
             }  
-        });  
-        return ntrade;  
+        });
+        return ntrade;
     }
     
     /**

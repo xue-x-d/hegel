@@ -8,10 +8,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
-
-import com.shomop.crm.dao.impl.JsonRedisSeriaziler;
 /**
  * redisCach
  * @author spencer.xue
@@ -24,14 +23,14 @@ public abstract class RedisCacheImpl<K, V extends Serializable> implements Cache
 	
 	@Autowired  
     protected RedisTemplate<K,V> redisTemplate;
-	protected JsonRedisSeriaziler<V> jsonRedisSeriaziler;
-	protected JdkSerializationRedisSerializer jdkRedisSeriaziler;
-	private Class<V> type; // convenient avoid TypeReference
+	protected RedisSerializer<V> jsonRedisSeriaziler;
+	protected RedisSerializer<?> jdkRedisSeriaziler;
+	private Class<V> type; // convenient, avoid TypeReference
 	
 	public RedisCacheImpl() {
-		jsonRedisSeriaziler = new JsonRedisSeriaziler<V>();
+		type = (Class<V>)((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
+		jsonRedisSeriaziler = new JacksonJsonRedisSerializer<V>(type);
 		jdkRedisSeriaziler = new JdkSerializationRedisSerializer();
-		type = (Class<V>)((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 	}
 	
 	public Class<V> getType() {
@@ -46,7 +45,7 @@ public abstract class RedisCacheImpl<K, V extends Serializable> implements Cache
 	public void setRedisTemplate(RedisTemplate<K, V> redisTemplate) {
 		this.redisTemplate = redisTemplate;
 	}
-      
+
 	/**
 	 * StringSerializer
 	 * 
@@ -61,7 +60,7 @@ public abstract class RedisCacheImpl<K, V extends Serializable> implements Cache
 	 * 
 	 * @return
 	 */
-	protected JsonRedisSeriaziler<V> getJsonRedisSerializer() {
+	protected RedisSerializer<V> getJsonRedisSerializer() {
 		return jsonRedisSeriaziler;
 	}
 
@@ -70,7 +69,7 @@ public abstract class RedisCacheImpl<K, V extends Serializable> implements Cache
 	 * 
 	 * @return
 	 */
-	protected JdkSerializationRedisSerializer getJdkRedisSeriaziler() {
+	protected RedisSerializer<?> getJdkRedisSeriaziler() {
 		return jdkRedisSeriaziler;
 	}
 	

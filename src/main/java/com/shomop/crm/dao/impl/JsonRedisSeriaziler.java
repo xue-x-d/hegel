@@ -23,7 +23,7 @@ public class JsonRedisSeriaziler<T> {
 	 * @param object
 	 * @return
 	 */
-	public String seriazile(T t) {
+	public String serialize(T t) {
 		if (t == null) {
 			return EMPTY_JSON_STR;
 		}
@@ -35,7 +35,7 @@ public class JsonRedisSeriaziler<T> {
 		}
 	}
 	
-	public byte[] seriazileAsBytes(T t) {
+	public byte[] serializeAsBytes(T t) {
 		if (t == null) {
 			return EMPTY_JSON_BYTE;
 		}

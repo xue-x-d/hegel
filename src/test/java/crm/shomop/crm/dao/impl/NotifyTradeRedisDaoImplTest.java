@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
-import com.shomop.crm.dao.impl.JsonRedisSeriaziler;
+import com.shomop.crm.common.cache.CacheException;
 import com.shomop.crm.dao.impl.NotifyTradeRedisDaoImpl;
 import com.shomop.crm.model.notify.DDNotifyTrade;
 
@@ -30,19 +30,11 @@ public class NotifyTradeRedisDaoImplTest  extends AbstractJUnit4SpringContextTes
         	trade.setTid(Long.valueOf(10+""+i));
         	trade.setUserId(Long.valueOf(20+""+i));
         	list.add(trade);
-        } 
-        int index = 1;
-        long begin = System.currentTimeMillis();  
-        for (DDNotifyTrade trade : list) {  
-//        	notifyTradeRedisDao.add("user_add:"+index,trade);
-        	index ++;
         }
-        //耗时： 110034
-        System.out.println("耗时： "+(System.currentTimeMillis() -  begin));
-        begin = System.currentTimeMillis();
-        index = 50000;
+        long begin = System.currentTimeMillis();
+        int index = 1;
         for (DDNotifyTrade trade : list) {  
-			notifyTradeRedisDao.put("user_add:"+index,trade);
+			notifyTradeRedisDao.put("user_put:"+index,trade);
         	index ++;
         }
         //耗时： 103573
@@ -50,16 +42,17 @@ public class NotifyTradeRedisDaoImplTest  extends AbstractJUnit4SpringContextTes
     } 
     
     @Test
-    public void testGet(){
+    public void testGet() throws CacheException{
+//        notifyTradeRedisDao.getRedisTemplate().setValueSerializer(new JsonTest(DDNotifyTrade.class));
     	long begin = System.currentTimeMillis();  
-    	for (int i = 1; i < 50000; i++) {  
-    		notifyTradeRedisDao.get("user_put:"+i);;
+    	for (int i = 50000; i < 50005; i++) {  
+    		System.out.println(notifyTradeRedisDao.get("user_put:"+i));
     	}
     	System.out.println("耗时： "+(System.currentTimeMillis() -  begin));
-    	
-    	String ob = "{\"status\":null,\"insertTime\":null,\"tid\":1010,\"userId\":2010}";
-    	JsonRedisSeriaziler<DDNotifyTrade> jr = new JsonRedisSeriaziler<DDNotifyTrade>();
-    	System.out.println(jr.deserialize(ob.getBytes(),DDNotifyTrade.class));
+//    	String ob = "{\"status\":null,\"insertTime\":null,\"tid\":1010,\"userId\":2010}";
+//    	System.out.println(ob);
+//    	JsonRedisSeriaziler<DDNotifyTrade> jr = new JsonRedisSeriaziler<DDNotifyTrade>();
+//    	System.out.println(jr.deserialize(ob.getBytes(),DDNotifyTrade.class));
     }
 	
 
