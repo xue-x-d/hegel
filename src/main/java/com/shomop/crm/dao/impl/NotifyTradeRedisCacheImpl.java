@@ -13,8 +13,8 @@ import com.shomop.crm.common.cache.CacheException;
 import com.shomop.crm.common.cache.RedisCacheImpl;
 import com.shomop.crm.model.notify.DDNotifyTrade;
 
-@Repository("notifyTradeRedisDao")
-public class NotifyTradeRedisDaoImpl extends RedisCacheImpl<String,DDNotifyTrade>{
+@Repository("notifyTradeRedisCache")
+public class NotifyTradeRedisCacheImpl extends RedisCacheImpl<String,DDNotifyTrade>{
 	
 	/**
 	 * 新增
