@@ -13,7 +13,7 @@ import com.shomop.crm.dao.impl.NotifyTradeRedisCacheImpl;
 import com.shomop.crm.model.notify.DDNotifyTrade;
 
 @ContextConfiguration(locations = {"classpath:/application.xml"})  
-public class NotifyTradeRedisDaoImplTest  extends AbstractJUnit4SpringContextTests {
+public class NotifyTradeRedisCacheImplTest extends AbstractJUnit4SpringContextTests {
 	
 	@Autowired  
 	private NotifyTradeRedisCacheImpl notifyTradeRedisCache;
@@ -21,33 +21,34 @@ public class NotifyTradeRedisDaoImplTest  extends AbstractJUnit4SpringContextTes
 	/** 
      * 批量新增
      */  
-    //@Test  
+    @Test  
     public void testAddUsers1() { 
     	System.out.println(notifyTradeRedisCache);
-        List<DDNotifyTrade> list = new ArrayList<DDNotifyTrade>(50000);  
-        for (int i = 10; i < 15; i++) {  
+        List<DDNotifyTrade> list = new ArrayList<DDNotifyTrade>(20);  
+        for (int i = 10; i < 20; i++) {  
         	DDNotifyTrade trade = new DDNotifyTrade();
         	trade.setTid(Long.valueOf(10+""+i));
         	trade.setUserId(Long.valueOf(20+""+i));
         	list.add(trade);
         }
         long begin = System.currentTimeMillis();
-        int index = 1;
-        for (DDNotifyTrade trade : list) {  
-			notifyTradeRedisCache.put("user_put:"+index,trade);
-        	index ++;
-        }
+        System.out.println(notifyTradeRedisCache.putList("user_110",list));
         //耗时： 103573
         System.out.println("耗时： "+(System.currentTimeMillis() -  begin));  
     } 
     
     @Test
     public void testGet() throws CacheException{
-//        notifyTradeRedisDao.getRedisTemplate().setValueSerializer(new JsonTest(DDNotifyTrade.class));
-    	long begin = System.currentTimeMillis();  
-    	for (int i = 50000; i < 50005; i++) {  
-    		System.out.println(notifyTradeRedisCache.get("user_put:"+i));
-    	}
+    	long begin = System.currentTimeMillis();
+    	List<DDNotifyTrade> trades = notifyTradeRedisCache.getAll("user_110");
+    	for (DDNotifyTrade ddNotifyTrade : trades) {
+			System.out.println(ddNotifyTrade.getTid());
+		}
+    	System.out.println("pop: "+notifyTradeRedisCache.get("user_110").getTid());
+    	List<DDNotifyTrade> trades2 = notifyTradeRedisCache.getAll("user_110");
+    	for (DDNotifyTrade ddNotifyTrade : trades2) {
+			System.out.println(ddNotifyTrade.getTid());
+		}
     	System.out.println("耗时： "+(System.currentTimeMillis() -  begin));
 //    	String ob = "{\"status\":null,\"insertTime\":null,\"tid\":1010,\"userId\":2010}";
 //    	System.out.println(ob);

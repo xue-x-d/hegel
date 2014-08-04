@@ -14,3 +14,4 @@
 /.project
 /.classpath
 /.project
+/src/main/resources/develop/jdbc.properties
