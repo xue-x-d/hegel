@@ -11,13 +11,15 @@ import org.springframework.util.Assert;
 
 import com.shomop.crm.common.cache.CacheException;
 import com.shomop.crm.common.cache.RedisCacheImpl;
+import com.shomop.crm.dao.NotifyTradeRedisCache;
 import com.shomop.crm.model.notify.DDNotifyTrade;
 
 @Repository("notifyTradeRedisCache")
-public class NotifyTradeRedisCacheImpl extends RedisCacheImpl<String,DDNotifyTrade>{
+public class NotifyTradeRedisCacheImpl extends RedisCacheImpl<String,DDNotifyTrade> implements NotifyTradeRedisCache{
 	
 	/**  
-     * 通过key获取 
+     * Retrieves all elements of list, but does not remove.
+     * or returns <tt>null</tt> if this list is empty.
      * @param keyId 
      * @return 
      */  
@@ -140,5 +142,11 @@ public class NotifyTradeRedisCacheImpl extends RedisCacheImpl<String,DDNotifyTra
 			}
 		}); 
     }
+
+	@Override
+	public boolean putNTrade(DDNotifyTrade trade) {
+		
+		return false;
+	}
     
 }
