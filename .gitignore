@@ -12,6 +12,5 @@
 /.classpath
 
 /.project
-/.classpath
-/.project
-/src/main/resources/develop/jdbc.properties
+
+/src/main/resources/product/jdbc.properties

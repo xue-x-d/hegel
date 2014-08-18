@@ -14,7 +14,7 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
  * @date 2014-6-19
  */
 @ContextConfiguration(locations = "classpath:/application.xml")
-@TransactionConfiguration(defaultRollback = true)
+@TransactionConfiguration(defaultRollback = true,transactionManager="txManager")
 public class BaseTestCase extends AbstractTransactionalJUnit4SpringContextTests {
 	// applicationContext
 	// logger

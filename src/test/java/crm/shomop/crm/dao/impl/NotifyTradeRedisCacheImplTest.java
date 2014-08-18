@@ -23,7 +23,7 @@ public class NotifyTradeRedisCacheImplTest extends AbstractJUnit4SpringContextTe
 	/** 
      * 批量新增
      */  
-    //@Test  
+    @Test  
     public void testAddUsers1() { 
     	System.out.println(notifyTradeRedisCache);
         List<DDNotifyTrade> list = new ArrayList<DDNotifyTrade>(20);  
@@ -58,7 +58,7 @@ public class NotifyTradeRedisCacheImplTest extends AbstractJUnit4SpringContextTe
 //    	System.out.println(jr.deserialize(ob.getBytes(),DDNotifyTrade.class));
     }
     
-    @Test
+    //@Test
     public void testJsonserialize(){
     	DDNotifyTrade trade = new DDNotifyTrade();
     	trade.setTid(Long.valueOf(10+""+10));

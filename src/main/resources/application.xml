@@ -72,7 +72,6 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 	
-	
 	<!-- XML AOP事务管理  -->
 	<!-- 强制使用CGLIB代理 -->
 	<aop:config proxy-target-class="true">

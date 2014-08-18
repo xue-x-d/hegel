@@ -22,4 +22,10 @@ public class UserDaoImpl extends GenericDaoImpl<User, String> implements UserDao
 		
 		return null;
 	}
+
+	@Override
+	public User loadUser(String id) {
+		// TODO Auto-generated method stub
+		return (User)getCurrentSession().load(User.class,id);
+	}
 }
