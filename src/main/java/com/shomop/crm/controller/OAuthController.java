@@ -22,6 +22,7 @@ import org.apache.http.util.CharArrayBuffer;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +34,7 @@ import com.google.gson.Gson;
 import com.shomop.crm.model.DDEditionInfo;
 import com.shomop.crm.server.SpringContextHolder;
 import com.shomop.crm.server.TestInjection;
+import com.shomop.dd.sdk.DDClient;
 import com.shomop.http.factory.HttpClientFactory;
 import com.shomop.util.Digest;
 import com.shomop.util.sendRequestUtils;
@@ -44,32 +46,27 @@ import com.taobao.api.internal.util.TaobaoUtils;
 public class OAuthController {
 	
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
-	
-	private static final String APP_ID = "2100002437";
-	
-	private static final String APP_SECRET = "2674D8281B40C0510ECC8CFF633492E7";
+	@Autowired
+	private DDClient ddClient;
 	
 	private static final String AUTH_CODE_URL_PREFIX = "http://oauth.dangdang.com/authorize?";
-	
 	private static final String AUTH_TOKEN_URL_PREFIX = "http://oauth.dangdang.com/token?";
-	
 	// 对于Server-side flow，redirect_uri是必选参数，并且要求redirect_uri与callback的顶级域名一致。
 	private static final String REDIRECT_URL = "http://183.157.94.219:9090/jd-service/oauth/callback";
 	
 	private static final Map<String,String> req_params = new HashMap<String,String>();
 	
-	static {
-		req_params.put("appId",APP_ID);
-		req_params.put("redirectUrl",REDIRECT_URL);
-		req_params.put("responseType","code");
-		req_params.put("state","shomop");
-		req_params.put("view","web");
-	}
-	
 	private static HttpClient httpClient = HttpClientFactory.getHttpClient(3000,3000);
 	
-	@RequestMapping(value = "/", method = RequestMethod.GET)
+	@RequestMapping(value = "/index.do", method = RequestMethod.GET)
 	public void oauth(HttpServletResponse rsp){
+		if (req_params.size() == 0) {
+			req_params.put("appId", ddClient.getAppKey());
+			req_params.put("redirectUrl", REDIRECT_URL);
+			req_params.put("responseType", "code");
+			req_params.put("state", "shomop");
+			req_params.put("view", "web");
+		}
 		try {
 			String query = sendRequestUtils.buildQuery(req_params,sendRequestUtils.DEFAULT_CHARSET);
 			logger.info(query);
@@ -90,10 +87,10 @@ public class OAuthController {
 		}*/
 		try {
 			Map<String,String> params = new HashMap<String,String>();
-			params.put("appId",APP_ID);
+			params.put("appId",ddClient.getAppKey());
 			params.put("grantType","code");
 			params.put("code",code);
-			params.put("appSecret",APP_SECRET);
+			params.put("appSecret",ddClient.getAppSecret());
 			// TODO 到底什么意思 仅仅是为了验证
 			params.put("redirectUrl",REDIRECT_URL);
 			params.put("state","shomop");
@@ -125,7 +122,7 @@ public class OAuthController {
 //	@ResponseBody
 	public void refreshToken(@RequestParam String refreshToken,PrintWriter writer){
 		StringBuffer params = new StringBuffer(AUTH_TOKEN_URL_PREFIX);
-		params.append("appId").append("=").append(APP_ID).append("&");
+		params.append("appId").append("=").append(ddClient.getAppKey()).append("&");
 		params.append("grantType").append("=").append("token").append("&");
 		params.append("refreshToken").append("=").append(refreshToken);
 		HttpPost postMethod = new HttpPost(params.toString());
@@ -171,7 +168,7 @@ public class OAuthController {
 			return false;
 		}
 		StringBuffer params = new StringBuffer();
-		params.append(APP_SECRET);
+		params.append(ddClient.getAppSecret());
 		String shopId = result.get("shop_id") == null ? "" : result.get("shop_id");
 		params.append("shop_id").append(shopId);
 		
@@ -184,7 +181,7 @@ public class OAuthController {
 		String editionEndDate = result.get("edition_end_date") == null ? "" : result.get("edition_end_date");
 		params.append("edition_end_date").append(editionEndDate);
 		
-		params.append(APP_SECRET);
+		params.append(ddClient.getAppSecret());
 		String sign = Digest.md5(new String(params.toString().getBytes(),Charset.forName("UTF-8")));
 		return sign.equals(result.get("sign"));
 	}
