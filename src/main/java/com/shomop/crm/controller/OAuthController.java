@@ -32,8 +32,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.Gson;
 import com.shomop.crm.model.DDEditionInfo;
-import com.shomop.crm.server.SpringContextHolder;
-import com.shomop.crm.server.TestInjection;
+import com.shomop.crm.service.additional.SpringContextHolder;
+import com.shomop.crm.service.additional.TestInjection;
 import com.shomop.dd.sdk.DDClient;
 import com.shomop.http.factory.HttpClientFactory;
 import com.shomop.util.Digest;

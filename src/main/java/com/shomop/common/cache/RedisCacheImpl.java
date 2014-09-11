@@ -1,4 +1,4 @@
-package com.shomop.crm.common.cache;
+package com.shomop.common.cache;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;

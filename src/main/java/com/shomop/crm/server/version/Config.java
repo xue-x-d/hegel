@@ -1,9 +1,9 @@
-package com.shomop.connect.server.version;
+package com.shomop.crm.server.version;
 
 import java.io.File;
 
-import com.shomop.connect.server.version.enums.ENV;
-import com.shomop.connect.server.version.enums.VERSION;
+import com.shomop.crm.server.version.enums.ENV;
+import com.shomop.crm.server.version.enums.VERSION;
 
 
 /**

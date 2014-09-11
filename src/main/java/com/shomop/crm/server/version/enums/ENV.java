@@ -1,4 +1,4 @@
-package com.shomop.connect.server.version.enums;
+package com.shomop.crm.server.version.enums;
 
 public enum ENV {
     DEVELOP("develop"),PRODUCT("product"),JUNIT("junit");

@@ -16,23 +16,14 @@
 
 	<context:property-placeholder location="classpath:product/*.properties" />
 
-	<context:annotation-config />
+    <!-- context:component-scan annotation-config="true" 默认激活该标签，所以一般不需要配置-->
+	<!-- <context:annotation-config />-->
 	
-	<context:component-scan base-package="com.shomop" />
+	<context:component-scan base-package="com.shomop.crm.service,com.shomop.crm.dao" />
 
 	<!-- redis pool -->
     <import resource="redis.xml"/>
 	 
-	<bean id="testInjection" class="com.shomop.crm.server.TestInjection">
-	    <property name="people">
-	     <list value-type="java.lang.String">
-	      <value>刘备</value>
-	      <value>关羽</value>
-	      <value>张飞</value>
-	     </list>
-	    </property>
-	</bean>
-	
 	<bean id="ddClient" class="com.shomop.dd.sdk.DDClient">
 		<constructor-arg index="0" type="java.lang.String"
 			value="${dd.serverUrl}" />
@@ -42,4 +33,19 @@
 			value="${dd.secret}" />
 	</bean>
 	
+	<bean id="testInjection" class="com.shomop.crm.service.additional.TestInjection" abstract="true" init-method="initMethod">
+		<property name="people">
+			<list value-type="java.lang.String">
+				<value>刘备</value>
+				<value>关羽</value>
+				<value>张飞</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="testInjection2" class="com.shomop.crm.service.additional.TestInjection2" parent="testInjection" autowire="byType" />
+	
+	<bean id="autowireTest" class="com.shomop.crm.service.additional.AutowireTest">
+	   <property name="name" value="autowireTest" />
+	</bean>
 </beans>

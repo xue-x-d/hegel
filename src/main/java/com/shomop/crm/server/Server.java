@@ -2,9 +2,9 @@ package com.shomop.crm.server;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.shomop.connect.server.version.ClassPathXmlApplicationContextInit;
-import com.shomop.connect.server.version.Config;
-import com.shomop.connect.server.version.enums.VERSION;
+import com.shomop.crm.server.version.ClassPathXmlApplicationContextInit;
+import com.shomop.crm.server.version.Config;
+import com.shomop.crm.server.version.enums.VERSION;
 /**
  * 目前有taobao,dd,jd
  * 启动读取环境变量VERSION

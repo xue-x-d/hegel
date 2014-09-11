@@ -11,12 +11,12 @@ import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
-import com.shomop.crm.common.cache.CacheException;
+import com.shomop.common.cache.CacheException;
 import com.shomop.crm.dao.impl.GsonRedisSeriaziler;
 import com.shomop.crm.dao.impl.NotifyTradeRedisCacheImpl;
 import com.shomop.crm.model.notify.DDNotifyTrade;
 
-@ContextConfiguration(locations = {"classpath:/application.xml"})  
+@ContextConfiguration(locations = {"classpath:application.xml","classpath:spring-hibernate.xml"})
 public class NotifyTradeRedisCacheImplTest extends AbstractJUnit4SpringContextTests {
 	
 	@Autowired  

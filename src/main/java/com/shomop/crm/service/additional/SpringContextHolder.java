@@ -1,4 +1,4 @@
-package com.shomop.crm.server;
+package com.shomop.crm.service.additional;
 import java.util.Map;
 
 import org.springframework.context.ApplicationContext;

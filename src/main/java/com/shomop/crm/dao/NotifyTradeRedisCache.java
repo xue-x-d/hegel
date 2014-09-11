@@ -2,7 +2,7 @@ package com.shomop.crm.dao;
 
 import java.util.List;
 
-import com.shomop.crm.common.cache.Cache;
+import com.shomop.common.cache.Cache;
 import com.shomop.crm.model.notify.DDNotifyTrade;
 /**
  * 

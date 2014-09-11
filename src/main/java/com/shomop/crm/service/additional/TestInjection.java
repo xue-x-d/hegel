@@ -1,8 +1,8 @@
-package com.shomop.crm.server;
+package com.shomop.crm.service.additional;
 
 import java.util.List;
 
-public class TestInjection {
+public abstract class TestInjection {
 
 	private List<String> people;
 
@@ -13,5 +13,6 @@ public class TestInjection {
 	public void setPeople(List<String> people) {
 		this.people = people;
 	}
+	
 
 }

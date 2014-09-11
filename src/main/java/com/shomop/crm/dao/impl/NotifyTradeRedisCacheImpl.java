@@ -9,8 +9,8 @@ import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
-import com.shomop.crm.common.cache.CacheException;
-import com.shomop.crm.common.cache.RedisCacheImpl;
+import com.shomop.common.cache.CacheException;
+import com.shomop.common.cache.RedisCacheImpl;
 import com.shomop.crm.dao.NotifyTradeRedisCache;
 import com.shomop.crm.model.notify.DDNotifyTrade;
 

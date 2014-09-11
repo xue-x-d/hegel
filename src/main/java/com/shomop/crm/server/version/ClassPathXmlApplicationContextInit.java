@@ -1,4 +1,4 @@
-package com.shomop.connect.server.version;
+package com.shomop.crm.server.version;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**

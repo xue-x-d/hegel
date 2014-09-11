@@ -1,4 +1,4 @@
-package com.shomop.crm.common.cache;
+package com.shomop.common.cache;
 
 
 /**
