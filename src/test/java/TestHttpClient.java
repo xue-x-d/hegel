@@ -10,6 +10,7 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -37,7 +38,7 @@ public class TestHttpClient {
 		gson = new Gson();
     }
     
-	@Test
+	//@Test
 	public void testAjax() {
 		// post
 		HttpPost httpPost = new HttpPost(url);
@@ -121,6 +122,21 @@ public class TestHttpClient {
 			int code1 = res.getStatusLine().getStatusCode();
 			System.out.println(code1);
 			System.out.println(res);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testSession() {
+		HttpClient client = new DefaultHttpClient();
+		HttpGet get = new HttpGet("http://localhost:8080/jd-service/req/session?id=refuser&username=xxd");
+		try {
+			HttpResponse res = client.execute(get);
+			int code1 = res.getStatusLine().getStatusCode();
+			System.out.println(code1);
+			String result = EntityUtils.toString(res.getEntity());
+			System.out.println(result);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

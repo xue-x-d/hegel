@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,12 +15,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.google.gson.Gson;
 import com.shomop.crm.model.User;
 
 @Controller()
 @RequestMapping(value="/req")
+@SessionAttributes(types={User.class},value={"user"})
 public class RequestParamController {
 
 	//REST 风格 只能是get方式
@@ -102,13 +106,47 @@ public class RequestParamController {
 	// Add one attribute  
 	// The return value of the method is added to the model under the name "user"  
 	// You can customize the name via @ModelAttribute("myUser")  
-	/*@ModelAttribute  
+	@ModelAttribute("refuser")  
 	public User getUser(@RequestParam(value="id") String userId) {
-		System.out.println("getUser——> id: "+userId);
+		System.out.println("request——> id: "+userId);
 		User user = new User();
-		user.setId("getUser");
+		user.setId("refuserid");
+		user.setUsername("refusername");
 	    return user;  
-	} */ 
+	}
+	/**
+	 * 此处需要注意：如果使用@SessionAttributes注解控制器类之后，③步骤一定是从模型对象中取得同名的命令对象，
+	 * 如果模型数据中不存在将抛出(不同版本不同)
+	 * HttpSessionRequiredException Expected session attribute‘user’(Spring3.1) 
+	 * HttpSessionRequiredException Session attribute ‘user’required - not found in session(Spring3.0)
+	 * @param user
+	 * @return
+	 */
+	@RequestMapping(value = "/session", method = RequestMethod.GET)
+	public String registerUser(@ModelAttribute("refuser") User user) {
+		System.out.println("session: " + new Gson().toJson(user));
+		return "success";
+	}
 	
+	@RequestMapping(value = "/session2", method = RequestMethod.GET)
+	public String registerUser2(@ModelAttribute User user) {
+		System.out.println("session2: " + new Gson().toJson(user));
+		return "success";
+	}
+	
+	@RequestMapping(value = "/showSession", method = RequestMethod.GET)      
+    public String showUser(@ModelAttribute User user) {   
+		
+        return "success";      
+    } 
+	
+	@RequestMapping(value = "/showGet", method = RequestMethod.GET)      
+    public String showUser2(@RequestParam("id")String userId,ModelMap model) {   
+		User user = new User();
+		user.setId(userId);
+		user.setUsername("showGet");
+        model.addAttribute("user",user); //②向ModelMap中添加一个属性      
+        return "success";      
+    } 	
 	
 }
