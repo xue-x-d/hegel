@@ -6,4 +6,6 @@ import com.shomop.crm.model.User;
 public interface UserDao extends GenericDao<User, String> {
 	
 	public User findUserByName(String name);
+	
+	public User loadUser(String id);
 }

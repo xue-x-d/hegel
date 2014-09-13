@@ -6,8 +6,13 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.shomop.crm.dao.UserDao;
 import com.shomop.crm.model.User;
+import com.shomop.crm.service.UserManager;
 import com.shomop.crm.test.BaseTestCase;
 
 /**
@@ -17,6 +22,11 @@ import com.shomop.crm.test.BaseTestCase;
  */
 @SuppressWarnings("unchecked")
 public class UserTest extends BaseTestCase {
+	
+	@Autowired
+	private UserDao userDao;
+	@Autowired
+	private UserManager userManager;
 
 	/**
 	 * The first-level cache is the Session cache and is a mandatory cache through which all requests must pass.
@@ -179,7 +189,7 @@ public class UserTest extends BaseTestCase {
 	 * 相关即where后的条件相关，不同的查询条件，其缓存的id也不一样） ，查询缓存的生命周期，当前关联的表发生修改
 	 * 或是查询条件改变时，那么查询缓存生命周期结束，它不受一级缓存 和二级缓存的生命周期的影响
 	 */
-	@Test
+	//@Test
 	public void testQueryCache2(){
 		Session session = sessionFactory.openSession();
 		List<Object[]> ls = (List<Object[]>)session.createQuery("select id,username from User").setCacheable(true)
@@ -193,6 +203,27 @@ public class UserTest extends BaseTestCase {
 				.list();
 		System.out.println(ls2.get(0)[0]+"---------------------");
 		session.close();
+	}
+	
+	/**
+	 * 测试方法
+	 */
+	@Test
+	@Rollback(value=false)
+	@Transactional(readOnly=false,value="txManager")
+	public void testLoadUser(){
+		Session session = getCurrentSession();
+//		Object object1 = session.get(User.class,"402881e747e8a9590147e8a95c150000");
+//		System.out.println(((object1)user).getUsername());// 缓存中没有查找数据库
+		Object object = session.load(User.class,"402881e747e8a9590147e8a95c150000");
+		System.out.println(object.getClass()); // 打印代理对象：class com.shomop.crm.model.User_$$_javassist_0
+		// hibernate sql 查找数据库
+		System.out.println(((User)object).getUsername()); // xuexiaodong1
+		User user = new User();
+		user.setUsername("xuexiaodong4");
+		user.setUserId(2143213L);
+		userDao.saveOrUpdate(user);
+//		userManager.save(user); // 相当于service 方法中调用service方法
 	}
 	
 }

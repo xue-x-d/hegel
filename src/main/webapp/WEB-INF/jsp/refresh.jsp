@@ -15,7 +15,7 @@
 </head>
 <body>
 	<p align="center">刷新授权码</p>
-	<form action="<%=path%>/oauth/refreshToken" enctype="application/x-www-form-urlencoded" method="post">
+	<form action="<%=path%>/oauth/refreshToken.do" enctype="application/x-www-form-urlencoded" method="post">
 	 <input name="refreshToken" maxlength="50" type="text" width="50"/>
 	 <input type="submit" />
 	</form>

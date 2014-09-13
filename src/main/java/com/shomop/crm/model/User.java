@@ -11,6 +11,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Type;
 
 @Entity
@@ -59,7 +60,8 @@ public class User implements Identifier<String>, Cloneable {
 	public String getUsername() {
 		return username;
 	}
-
+	@Column(columnDefinition="bigint(20) DEFAULT NULL COMMENT '用户id'")
+	@Index(name="index_userId")
 	public long getUserId() {
 		return userId;
 	}

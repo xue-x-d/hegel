@@ -1,4 +1,4 @@
-package com.shomop.crm.common.cache;
+package com.shomop.common.cache;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
@@ -13,6 +13,7 @@ import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializer;
 /**
  * redisCach
+ * user default Serializer
  * @author spencer.xue
  * @date 2014-7-30
  */
@@ -20,7 +21,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 public abstract class RedisCacheImpl<K, V extends Serializable> implements Cache<K,V>{
 
 	protected final static Log logger = LogFactory.getLog(RedisCacheImpl.class);
-	
+	protected final static long LIST_MAX = 4294967295L;
 	@Autowired  
     protected RedisTemplate<K,V> redisTemplate;
 	protected RedisSerializer<V> jsonRedisSeriaziler;
@@ -28,7 +29,8 @@ public abstract class RedisCacheImpl<K, V extends Serializable> implements Cache
 	private Class<V> type; // convenient, avoid TypeReference
 	
 	public RedisCacheImpl() {
-		type = (Class<V>)((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
+		type = (Class<V>) ((ParameterizedType) getClass()
+				.getGenericSuperclass()).getActualTypeArguments()[1];
 		jsonRedisSeriaziler = new JacksonJsonRedisSerializer<V>(type);
 		jdkRedisSeriaziler = new JdkSerializationRedisSerializer();
 	}
@@ -39,7 +41,6 @@ public abstract class RedisCacheImpl<K, V extends Serializable> implements Cache
  
 	/**
 	 * 设置redisTemplate
-	 * 
 	 * @param redisTemplate the redisTemplate to set
 	 */
 	public void setRedisTemplate(RedisTemplate<K, V> redisTemplate) {
@@ -48,16 +49,14 @@ public abstract class RedisCacheImpl<K, V extends Serializable> implements Cache
 
 	/**
 	 * StringSerializer
-	 * 
 	 * @return
 	 */
-	protected RedisSerializer<String> getDefaultRedisSerializer() {
+	protected RedisSerializer<String> getStringRedisSerializer() {
 		return redisTemplate.getStringSerializer();
 	}
 
 	/**
 	 * josnSerializer
-	 * 
 	 * @return
 	 */
 	protected RedisSerializer<V> getJsonRedisSerializer() {
@@ -66,7 +65,6 @@ public abstract class RedisCacheImpl<K, V extends Serializable> implements Cache
 
 	/**
 	 * jdkSerializer
-	 * 
 	 * @return
 	 */
 	protected RedisSerializer<?> getJdkRedisSeriaziler() {
@@ -111,5 +109,9 @@ public abstract class RedisCacheImpl<K, V extends Serializable> implements Cache
 		redisTemplate.opsForValue().set(key,value);
 	}
 	
+	@Override
+	public long size(K key) {
+		return redisTemplate.opsForValue().size(key);
+	}
 	
 }
