@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.google.gson.Gson;
 import com.shomop.crm.model.User;
+import com.shomop.exception.BaseException;
 
 @Controller()
 @RequestMapping(value="/req")
@@ -149,4 +150,8 @@ public class RequestParamController {
         return "success";      
     } 	
 	
+	@RequestMapping(params={"method=testExc"} ,value = "test", method = RequestMethod.GET)
+    public void test() {  
+        throw new BaseException(BaseException.ERROR_SYSTEM,"全局配置出错！");  
+    } 
 }

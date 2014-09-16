@@ -1,5 +1,6 @@
 package com.shomop.util;
 
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -13,9 +14,9 @@ public class Digest {
 	public static String md5(String message) {
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
-			md.update(message.getBytes());
+			md.update(message.getBytes("UTF-8"));
 			byte result[] = md.digest();
-			StringBuffer buf = new StringBuffer();
+			StringBuilder buf = new StringBuilder();
 			for (byte b : result) {
 				int t = b & 0xff;
 				if (t < 16){
@@ -25,6 +26,8 @@ public class Digest {
 			}
 			return buf.toString();
 		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 		return "";
