@@ -1,12 +1,12 @@
 package com.shomop.crm.controller;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -62,5 +62,45 @@ public class ExceptionController {
 		} catch (Exception e) {
 			throw new BusinessException("detail of ajax exception information");
 		}
-	} 
+	}
+	
+	public static void main(String[] args) {
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		LinkedHashMap<String,String> map = new LinkedHashMap<String,String>();
+		map.put("1","a");
+		map.put("3","c");
+		map.put("2","b");
+		for (Iterator<String> it = map.keySet().iterator(); it.hasNext();) {
+			String key = it.next();
+			System.out.println(key + "=" + map.get(key));
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	}
 }

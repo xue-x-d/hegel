@@ -8,6 +8,7 @@
 </head>
 <body>
    <h3>未知异常，服务器出错。</h3>
-       ${errorInfo}
+       ${errorInfo}<br />
+      webInfo: ${webInfo}
 </body>
 </html>
