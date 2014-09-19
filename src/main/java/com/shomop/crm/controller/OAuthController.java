@@ -32,12 +32,13 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.Gson;
 import com.shomop.crm.model.DDEditionInfo;
-import com.shomop.crm.service.additional.SpringContextHolder;
-import com.shomop.crm.service.additional.TestInjection;
 import com.shomop.dd.sdk.DDClient;
+import com.shomop.exception.MailException;
 import com.shomop.http.factory.HttpClientFactory;
 import com.shomop.util.Digest;
 import com.shomop.util.sendRequestUtils;
+import com.shomop.util.mail.MailInfo;
+import com.shomop.util.mail.MailSender;
 import com.taobao.api.internal.util.TaobaoUtils;
 
 @Controller()
@@ -79,7 +80,7 @@ public class OAuthController {
 	@RequestMapping(value = "/callback", method = RequestMethod.GET)
 	public ModelAndView oauthCallback(@RequestParam String code,String sign,@ModelAttribute DDEditionInfo edition){
 		System.out.println("request params converted to bean------------------> "+new Gson().toJson(edition));
-		ModelAndView view = new ModelAndView();
+		ModelAndView modelAndview = new ModelAndView();
 		// TODO 判断state
 		/*if (!oauthSign(null)) {
 			view.setViewName("oauth_failed");
@@ -105,13 +106,13 @@ public class OAuthController {
 			for (String key : result.keySet()) {
 				 System.out.println(key + "——>" + result.get(key));
 			}
-			view.addObject("map",result);
-			view.setViewName("oauth_success");
+			modelAndview.addObject("map",result);
+			modelAndview.setViewName("oauth_success");
 		} catch (Exception e) {
 			e.printStackTrace();
-			view.setViewName("oauth_failed");
+			modelAndview.setViewName("oauth_failed");
 		}
-		return view;
+		return modelAndview;
 	}
 	
 	/**
@@ -186,11 +187,20 @@ public class OAuthController {
 		return sign.equals(result.get("sign"));
 	}
 	
-	@RequestMapping(value = "/people", method = RequestMethod.GET)
+	@RequestMapping(value = "/sendMail", method = RequestMethod.GET)
 	public void getPeople(PrintWriter writer){
-		TestInjection test = (TestInjection) SpringContextHolder.getBean("testInjection");
-		System.out.println();
-		writer.write(test.getPeople().toString());
+		 MailInfo mailInfo = new MailInfo(false,false);
+		 mailInfo.addTo("710709510@qq.com");
+		 mailInfo.setTitle("测试邮件");
+		 mailInfo.setContent("测试邮件");
+		 mailInfo.setFromPersonal("薛晓冬");
+//		 mailInfo.setContent("<h1 style=\"text-align:center;\">夏猫科技新功能上线，诚邀内测</h1><p>&nbsp;夏猫官方订购地址：</p><p>&nbsp;&nbsp;<a href=\"http://fuwu.taobao.com/ser/detail.htm?service_code=FW_GOODS-1865656\" target=\"_blank\">http://fuwu.taobao.com/ser/detail.htm?service_code=FW_GOODS-1865656</a></p>");
+		 try {
+			MailSender.sendMail(mailInfo);
+			writer.write("finished!");
+		} catch (MailException e) {
+			writer.write("failed."+e.getMessage());
+		}
 	}
 	
 	

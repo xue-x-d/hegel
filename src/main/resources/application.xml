@@ -14,10 +14,18 @@
            http://www.springframework.org/schema/mvc   
            http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
 
-	<context:property-placeholder location="classpath:product/*.properties" />
+	<context:property-placeholder location="classpath:product/jdbc.properties" />
 
     <!-- context:component-scan annotation-config="true" 默认激活该标签，所以一般不需要配置-->
 	<!-- <context:annotation-config />-->
+	
+	<bean id="customProperty" class="com.shomop.util.ext.CustomProperty">
+		<property name="locations">
+			<list>
+				<value>classpath:product/mail.properties</value>
+			</list>
+		</property>
+	</bean>
 	
 	<context:component-scan base-package="com.shomop.crm.service,com.shomop.crm.dao" />
 

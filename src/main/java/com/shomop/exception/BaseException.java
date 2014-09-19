@@ -42,15 +42,8 @@ public class BaseException extends RuntimeException{
 		return code;
 	}
 
-	public void setCode(int code) {
-		this.code = code;
-	}
-
 	public String getMessage() {
-		return message;
+		return "Code: "+code+" Desc: "+message;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
 }

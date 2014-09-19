@@ -306,11 +306,11 @@
 		<artifactId>jstl</artifactId>
 		<version>1.2</version>
 	</dependency>
-	<dependency>
+	<!--<dependency>
 		<groupId>jstl</groupId>
 		<artifactId>jstl</artifactId>
 		<version>1.1.2</version>
-	</dependency>
+	</dependency>-->
 	<dependency>
 		<groupId>com.taobao.api</groupId>
 		<artifactId>taobao-sdk</artifactId>
@@ -330,7 +330,14 @@
 		<groupId>org.json</groupId>
 		<artifactId>json</artifactId>
 		<version>20140107</version>
-		<scope>test</scope>
+		<scope>compile</scope>
+	</dependency>
+	<dependency>
+		<groupId>com.sun.mail</groupId>
+		<artifactId>javax.mail</artifactId>
+		<version>1.5.2</version>
+		<type>jar</type>
+		<scope>compile</scope>
 	</dependency>
   </dependencies>
 </project>

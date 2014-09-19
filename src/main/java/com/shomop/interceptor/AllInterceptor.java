@@ -10,6 +10,8 @@ public class AllInterceptor implements WebRequestInterceptor {
 	public void preHandle(WebRequest request) throws Exception {
 		 System.out.println("AllInterceptor...............................");  
 	     request.setAttribute("webInfo", "you are be traced", WebRequest.SCOPE_SESSION);
+	     
+	     
 	}
 
 	@Override
