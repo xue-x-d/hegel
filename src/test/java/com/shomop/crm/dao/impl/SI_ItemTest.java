@@ -1,4 +1,4 @@
-package crm.shomop.crm.dao.impl;
+package com.shomop.crm.dao.impl;
 
 import java.math.BigDecimal;
 import java.util.List;

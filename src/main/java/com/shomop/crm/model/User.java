@@ -1,12 +1,14 @@
 package com.shomop.crm.model;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -42,6 +44,7 @@ public class User implements Identifier<String>, Cloneable {
 	private int purchaseVersion; // 购买版本
 	private long sid;// 店铺id,shop+sid.taobao.com
 	private long lastDownBuyerTime;
+	private List<String> params;
 
 	// private long level;
 	@Id
@@ -267,5 +270,15 @@ public class User implements Identifier<String>, Cloneable {
 	// public void setLevel(long level) {
 	// this.level = level;
 	// }
+
+	@Transient
+	public List<String> getParams() {
+		return params;
+	}
+
+	public void setParams(List<String> params) {
+		this.params = params;
+	}
+	
 
 }

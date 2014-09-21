@@ -7,8 +7,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-	${pageScope.user.id} <br />
- ${requestScope.user.id} ${requestScope.user.username} request success<br />
- ${sessionScope.user.id} ${sessionScope.user.username} session success!
+ ${requestScope.user.id} ${requestScope.user.username} request success, ${sessionScope.user.id} ${sessionScope.user.username} session success!<br />
+ ${requestScope.refuser.id} ${requestScope.refuser.username} request success, ${sessionScope.refuser.id} ${sessionScope.refuser.username} session success!<br />
 </body>
 </html>

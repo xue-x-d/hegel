@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE sqlMapConfig      
     PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"      
-    "sql.tld">
+    "sql-map-2.dtd">
 <sqlMapConfig>
 	<settings cacheModelsEnabled="true" enhancementEnabled="true"
 		lazyLoadingEnabled="false" maxRequests="3000" maxSessions="3000"

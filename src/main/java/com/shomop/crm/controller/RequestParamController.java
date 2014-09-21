@@ -3,10 +3,13 @@ package com.shomop.crm.controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.List;
 
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +29,11 @@ import com.shomop.exception.BaseException;
 @SessionAttributes(types={User.class},value={"user"})
 public class RequestParamController {
 
+	/**
+	 * http://localhost:8080/jd-service/req/user/xue.do?id=1
+	 * @param userId
+	 * @param writer
+	 */
 	//REST 风格 只能是get方式
 	@RequestMapping("/user/{id}")
 	public void restRequest(@PathVariable("id") String userId,PrintWriter writer){
@@ -35,11 +43,17 @@ public class RequestParamController {
 	// header 中的信息
 	@RequestMapping("/headerInfo")
 	public void displayHeaderInfo(@RequestHeader("Accept-Encoding") String encoding,
-	                              @RequestHeader("Keep-Alive") long keepAlive,PrintWriter writer)  {
+	                              @RequestHeader(value="Keep-Alive",required=false) Long keepAlive,PrintWriter writer)  {
 			
 		writer.write(encoding+" "+keepAlive);
 	}
 	
+	// 获取cookie中的session信息
+	@RequestMapping("/cookieInfo")
+	public void test(@CookieValue(value="JSESSIONID", defaultValue="") String sessionId,PrintWriter writer){
+		
+		writer.write("sessionId: "+sessionId);
+	}
 	/**
 	 * A） 常用来处理简单类型的绑定，通过Request.getParameter() 获取的String可直接转换为简单类型的情况（
 	 * String-->简单类型的转换操作由ConversionService配置的转换器来完成）；因为使用request.getParameter()
@@ -54,6 +68,13 @@ public class RequestParamController {
        
 		writer.write(userId);
     }
+	
+	@RequestMapping(value = "/testMultiParam", method = RequestMethod.POST)
+	public void requestparam8(@RequestParam(value="list") List<String> list,@RequestParam(value="list") String[] roleList){
+		System.out.println("list: "+list.toString());
+		System.out.println("array: "+roleList[0]+","+roleList[1]);
+	} 
+	
 	
 	/**
 	 * @RequestBody
@@ -92,7 +113,7 @@ public class RequestParamController {
 	}
 	
 	/**
-	 * @ModelAttribute
+	 * @ModelAttribute 注意，在执行功能处理方法（@RequestMapping注解的方法）之前，自动添加到模型对象中，用于视图页面展示时使用。该controller所有的功能方法执行之前都会执行
 	 * 
 	 *                 该注解有两个用法，一个是用于方法上，一个是用于参数上；
 	 *                 用于方法上时： 通常用来在处理@RequestMapping之前，为请求绑定需要从后台查询的model
@@ -111,7 +132,7 @@ public class RequestParamController {
 	public User getUser(@RequestParam(value="id") String userId) {
 		System.out.println("request——> id: "+userId);
 		User user = new User();
-		user.setId("refuserid");
+		user.setId("ModelAttribute method");
 		user.setUsername("refusername");
 	    return user;  
 	}
@@ -123,23 +144,62 @@ public class RequestParamController {
 	 * @param user
 	 * @return
 	 */
+	/**
+	 * 在非SessionAttributes注解前提下
+	 * 先在非功能方法上获得 refuser,在该功能方法入参上获取refuser
+	 * 因为都是进行模型绑定，所以，后者就会覆盖前者的refuser
+	 * @param user
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = "/session", method = RequestMethod.GET)
-	public String registerUser(@ModelAttribute("refuser") User user) {
+	public String sessionUser(@ModelAttribute("refuser") User user,Model model) {
 		System.out.println("session: " + new Gson().toJson(user));
+		model.addAttribute("user", user);
 		return "success";
 	}
 	
-	@RequestMapping(value = "/session2", method = RequestMethod.GET)
-	public String registerUser2(@ModelAttribute User user) {
-		System.out.println("session2: " + new Gson().toJson(user));
-		return "success";
-	}
-	
+	/**
+	 * http://localhost:8080/jd-service/req/showSession.do?id=1&username=xue
+	 * 返回值：
+	 * 1 xue request success, session success!
+	 * ModelAttribute method refusername request success, session success!
+	 * 一、首先执行@ModelAttribute非功能性方法，将refuser绑定到model中，所以，model中有"refuser"
+	 * 二、提交参数通过功能处理方法的入参的绑定到model中，所以，model中有"user"
+	 * @param user
+	 * @return
+	 */
 	@RequestMapping(value = "/showSession", method = RequestMethod.GET)      
     public String showUser(@ModelAttribute User user) {   
 		
         return "success";      
     } 
+	
+	//http://localhost:8080/jd-service/req/register.do?id=1&username=xue&params=1,2,3
+	//http://localhost:8080/jd-service/req/register.do?id=1&username=xue&params=1&params=2&params=3
+	@RequestMapping(value = "/register", method = RequestMethod.GET)
+	public String registerUser(@ModelAttribute User user) {
+		System.out.println("register: " + new Gson().toJson(user));
+		return "success";
+	}
+
+	/**
+	 * post 也是两种方式 1、params=xue&params=xiao 2、params=xue,xiao,dong
+	 * @param user
+	 * @return
+	 */
+	@RequestMapping(value = "/register2", method = RequestMethod.POST)
+	public String registerUser2(@ModelAttribute User user) {
+		System.out.println("register2: " + new Gson().toJson(user));
+		return "success";
+	}
+	
+	@RequestMapping(value = "/registerNotModel", method = RequestMethod.POST)
+	public String registerUserNoModelAttr(User user) {
+		System.out.println("registerNotModel: " + new Gson().toJson(user));
+		return "success";
+	}
+	
 	
 	@RequestMapping(value = "/showGet", method = RequestMethod.GET)      
     public String showUser2(@RequestParam("id")String userId,ModelMap model) {   
@@ -148,7 +208,14 @@ public class RequestParamController {
 		user.setUsername("showGet");
         model.addAttribute("user",user); //②向ModelMap中添加一个属性      
         return "success";      
-    } 	
+    }
+	
+	@RequestMapping(value = "/notfromsession", method = RequestMethod.GET)
+	public String sessionUser2(@ModelAttribute("sessionuser") User user,Model model) {
+		System.out.println("session: " + new Gson().toJson(user));
+//		model.addAttribute("user", user);
+		return "success";
+	}
 	
 	@RequestMapping(params={"method=testExc"} ,value = "test", method = RequestMethod.GET)
     public void test() {  

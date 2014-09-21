@@ -1,4 +1,4 @@
-package crm.shomop.crm.dao.impl;
+package com.shomop.crm.dao.impl;
 
 import java.util.Iterator;
 import java.util.List;
