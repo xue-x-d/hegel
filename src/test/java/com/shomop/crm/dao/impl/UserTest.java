@@ -11,7 +11,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.shomop.crm.dao.UserDao;
-import com.shomop.crm.model.User;
+import com.shomop.crm.model.crm.User;
 import com.shomop.crm.service.UserManager;
 import com.shomop.crm.test.BaseTestCase;
 

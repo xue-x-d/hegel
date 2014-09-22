@@ -1,4 +1,4 @@
-package com.shomop.crm.model;
+package com.shomop.crm.model.crm;
 
 import java.util.Date;
 import java.util.List;
@@ -15,6 +15,8 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Type;
+
+import com.shomop.crm.model.Identifier;
 
 @Entity
 @Table(name = "user")

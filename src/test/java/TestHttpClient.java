@@ -21,7 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.gson.Gson;
-import com.shomop.crm.model.User;
+import com.shomop.crm.model.crm.User;
 import com.shomop.http.factory.HttpClientFactory;
 
 public class TestHttpClient {

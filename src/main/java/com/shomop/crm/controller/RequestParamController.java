@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.google.gson.Gson;
-import com.shomop.crm.model.User;
+import com.shomop.crm.model.crm.User;
 import com.shomop.exception.BaseException;
 
 @Controller()

@@ -4,6 +4,7 @@ package com.shomop.util.mail;
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
@@ -16,13 +17,15 @@ import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.shomop.exception.MailException;
 import com.shomop.exception.MailExceptionCode;
@@ -35,11 +38,9 @@ import com.sun.mail.util.MailSSLSocketFactory;
  */
 public class MailSender {
 
-	private static Logger logger = Logger.getLogger(MailSender.class);
+	private static Log logger = LogFactory.getLog(MailSender.class);
 	
 	private static final String DEFAULT_CONNECT_TIMEOUT = "2000";
-	
-	private static final String ATTACHMENT_ROOT_PATH = "";
 	
 	private static Session systemMailSession;
 	
@@ -50,7 +51,9 @@ public class MailSender {
 			throw new MailException("mailInfo is null");
 		}
 		Session mailSession = null;
-		if(StringUtils.isNotEmpty(mailInfo.getServerHost())){
+		// 考虑到不可能使用常见邮件服务器，所以缓存常见服务器及端口没有实际意义
+		if (StringUtils.isNotEmpty(mailInfo.getServerHost())
+				&& StringUtils.isNotEmpty(mailInfo.getServerPort())) {
 			Authenticator authenticator = null;
 			Properties prop = mailInfo.getProperties();  
 			if (mailInfo.isValidate()) {
@@ -63,9 +66,13 @@ public class MailSender {
 			mailSession = Session.getDefaultInstance(prop, authenticator);
 		}else{
 			mailSession = getSystemMailSession();
-		    logger.debug(">>> user system default mail server.");
+			if (logger.isDebugEnabled()) {
+				logger.debug(">>> user system default mail server.mailSession : "+ mailSession.toString());
+			}
 		}
-		mailSession.setDebug(true); // 开启调试
+		if (logger.isDebugEnabled()) {
+			mailSession.setDebug(true);
+		}
 		Message mailMessage = new MimeMessage(mailSession);
 		// 创建邮件消息体
 		try {
@@ -75,22 +82,42 @@ public class MailSender {
 				address.setPersonal(mailInfo.getFromPersonal(), Charset.forName("UTF-8").name());
 				mailMessage.setFrom(address);
 			}
-			if (mailInfo.getTo().size() > 0) {
+			List<String> tos = mailInfo.getTo();
+			if (tos.size() > 0) {
 				Address[] toAdds = new InternetAddress[mailInfo.getTo().size()];
-				for (int i = 0; i < mailInfo.getTo().size(); i++) {
-					toAdds[i] = new InternetAddress(mailInfo.getTo().get(i));
+				for (int i = 0; i < tos.size(); i++) {
+					try {
+						toAdds[i] = new InternetAddress(tos.get(i));
+					} catch (AddressException e) {
+						if (logger.isDebugEnabled()) {
+							logger.debug(">>> invalid email to recipient address."
+									+ "from address: "+ mailInfo.getFromAddress()
+									+ ",subject : "+ mailInfo.getTitle()
+									+ ",invalid address: "+ tos.get(i));
+						}
+					}
 				}
 				mailMessage.setRecipients(Message.RecipientType.TO,toAdds);
 			}
-			if (mailInfo.getCc().size() > 0) {
+			List<String> ccs = mailInfo.getCc();
+			if (ccs.size() > 0) {
 				Address[] ccAdds = new InternetAddress[mailInfo.getCc().size()];
-				for (int i = 0; i < mailInfo.getCc().size(); i++) {
-					ccAdds[i] = new InternetAddress(mailInfo.getTo().get(i));
+				for (int i = 0; i < ccs.size(); i++) {
+					try {
+						ccAdds[i] = new InternetAddress(ccs.get(i));
+					} catch (AddressException e) {
+						if (logger.isDebugEnabled()) {
+							logger.debug(">>> invalid email cc recipient address."
+									+ "from address: "+ mailInfo.getFromAddress() 
+									+ ",subject : "+ mailInfo.getTitle()
+									+ ",invalid address: " + ccs.get(i));
+						}
+					}
 				}
 				mailMessage.setRecipients(Message.RecipientType.CC,ccAdds);
 			}
-//			mailMessage.setRecipients(Message.RecipientType.TO, mailInfo.getTo().toArray(new Address[0]));
-//			mailMessage.setRecipients(Message.RecipientType.CC, mailInfo.getCc().toArray(new Address[0]));
+			//mailMessage.setRecipients(Message.RecipientType.TO, mailInfo.getTo().toArray(new Address[0]));
+			//mailMessage.setRecipients(Message.RecipientType.CC, mailInfo.getCc().toArray(new Address[0]));
 			mailMessage.setSubject(mailInfo.getTitle());
 			mailMessage.setSentDate(new Date());
 			if(mailInfo.isHtmlBody()){

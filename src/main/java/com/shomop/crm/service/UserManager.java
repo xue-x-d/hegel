@@ -1,6 +1,6 @@
 package com.shomop.crm.service;
 
-import com.shomop.crm.model.User;
+import com.shomop.crm.model.crm.User;
 
 public interface UserManager {
 	

@@ -1,5 +1,8 @@
 package com.shomop.crm.model;
 
+/**
+ * DD授权响应数据封装实体类
+ */
 public class DDEditionInfo {
 
 	private String sign;

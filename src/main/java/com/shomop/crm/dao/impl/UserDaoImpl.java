@@ -6,7 +6,7 @@ import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
 
 import com.shomop.crm.dao.UserDao;
-import com.shomop.crm.model.User;
+import com.shomop.crm.model.crm.User;
 
 @Repository("userDao")
 public class UserDaoImpl extends GenericDaoImpl<User, String> implements UserDao {
