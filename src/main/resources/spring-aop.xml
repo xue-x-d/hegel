@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+           http://www.springframework.org/schema/tx 
+           http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+           http://www.springframework.org/schema/mvc   
+           http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+ 
+	<!-- aop xml-->
+    <bean id="adviceBean" class="com.shomop.util.log.xml.LogAspect" />
+	<aop:config>
+		<!-- 将 fourAdviceBean 转换成切面 Bean, 切面 Bean 的新名称为：fourAdviceAspect，指定该切面的优先级为2 -->
+		<aop:aspect id="fourAdviceAspect" ref="fourAdviceBean"
+			order="2">
+			<!-- 定义个After增强处理，直接指定切入点表达式，以切面 Bean 中的 Release() 方法作为增强处理方法 -->
+			<aop:after pointcut="execution(* com.shomop.crm.controller.*.*(..))"
+				method="release" />
+			<!-- 定义个Before增强处理，直接指定切入点表达式，以切面 Bean 中的 authority() 方法作为增强处理方法 -->
+			<aop:before pointcut="execution(* com.shomop.crm.controller.*.*(..))"
+				method="authority" />
+			<!-- 定义个AfterReturning增强处理，直接指定切入点表达式，以切面 Bean 中的 log() 方法作为增强处理方法 -->
+			<aop:after-returning pointcut="execution(* com.shomop.crm.controller.*.*(..))"
+				method="log" />
+			<!-- 定义个Around增强处理，直接指定切入点表达式，以切面 Bean 中的 processTx() 方法作为增强处理方法 -->
+			<aop:around pointcut="execution(* com.shomop.crm.controller.*.*(..))"
+				method="processTx" />
+		</aop:aspect>
+	</aop:config>
+
+	<aop:config>
+		<!-- 定义一个切入点，myPointcut，直接知道它对应的切入点表达式 -->
+		<aop:pointcut id="myPointcut" expression="execution(* com.shomop.crm.controller.*.*(..))" />
+		<aop:aspect id="afterThrowingAdviceAspect" ref="adviceBean" order="1">
+			<!-- 使用上面定于切入点定义增强处理 -->
+			<!-- 定义一个AfterThrowing 增强处理，指定切入点以切面 Bean 中的 doRecovertyActions() 方法作为增强处理方法 -->
+			<aop:after-throwing pointcut-ref="myPointcut" method="doRecovertyActions" throwing="ex" />
+		</aop:aspect>
+	</aop:config>  
+
+</beans>

@@ -16,9 +16,9 @@
 
 	<context:property-placeholder location="classpath:product/jdbc.properties" />
 
-    <!-- context:component-scan annotation-config="true" 默认激活该标签，所以一般不需要配置-->
-	<!-- <context:annotation-config />-->
-	
+	<!-- context:component-scan annotation-config="true" 默认激活该标签，所以一般不需要配置 -->
+	<!-- <context:annotation-config /> -->
+
 	<bean id="customProperty" class="com.shomop.util.ext.CustomProperty">
 		<property name="locations">
 			<list>
@@ -26,12 +26,12 @@
 			</list>
 		</property>
 	</bean>
-	
-	<context:component-scan base-package="com.shomop.crm.service,com.shomop.crm.dao" />
+
+	<context:component-scan base-package="com.shomop.crm.service,com.shomop.crm.dao,com.shomop.util.log.annotation" />
 
 	<!-- redis pool -->
-    <import resource="redis.xml"/>
-	 
+	<import resource="redis.xml" />
+
 	<bean id="ddClient" class="com.shomop.dd.sdk.DDClient">
 		<constructor-arg index="0" type="java.lang.String"
 			value="${dd.serverUrl}" />
@@ -40,8 +40,9 @@
 		<constructor-arg index="2" type="java.lang.String"
 			value="${dd.secret}" />
 	</bean>
-	
-	<bean id="testInjection" class="com.shomop.crm.service.additional.TestInjection" abstract="true" init-method="initMethod">
+
+	<bean id="testInjection" class="com.shomop.crm.service.additional.TestInjection"
+		abstract="true" init-method="initMethod">
 		<property name="people">
 			<list value-type="java.lang.String">
 				<value>刘备</value>
@@ -50,10 +51,16 @@
 			</list>
 		</property>
 	</bean>
-	
-	<bean id="testInjection2" class="com.shomop.crm.service.additional.TestInjection2" parent="testInjection" autowire="byType" />
-	
+
+	<bean id="testInjection2" class="com.shomop.crm.service.additional.TestInjection2"
+		parent="testInjection" autowire="byType" />
+
 	<bean id="autowireTest" class="com.shomop.crm.service.additional.AutowireTest">
-	   <property name="name" value="autowireTest" />
+		<property name="name" value="autowireTest" />
 	</bean>
+
+	<!-- aop 注解-->
+	<!-- 启动对@AspectJ注解的支持 -->
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+
 </beans>
