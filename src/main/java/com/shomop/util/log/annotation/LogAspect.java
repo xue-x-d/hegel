@@ -8,9 +8,11 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Aspect
+@Order(1)
 @Component
 public class LogAspect {  
         
@@ -48,7 +50,7 @@ public class LogAspect {
     public Object processTx(ProceedingJoinPoint jp) throws java.lang.Throwable {  
         System.out.println("注解执行目标方法之前，模拟开始事物...");  
         // 执行目标方法，并保存目标方法执行后的返回值  
-        Object rvt = jp.proceed(new String[]{"被改变的参数"});
+        Object rvt = jp.proceed(new String[]{"被aop改变的参数"});
         System.out.println("注解执行目标方法之前，模拟结束事物...");  
         return rvt + "新增的内容";  
     }  

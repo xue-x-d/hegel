@@ -31,9 +31,10 @@ public class ExceptionController {
      
     /**
      * http://localhost:8080/jd-service/test.do?method=testExc
+     * @throws BaseException 
      */
 	@RequestMapping(params={"method=testExc"} ,value = "test", method = RequestMethod.GET)
-    public void test() {  
+    public void test() throws BaseException {  
         throw new BaseException(BaseException.ERROR_SYSTEM,"出错了！");  
     }
 	

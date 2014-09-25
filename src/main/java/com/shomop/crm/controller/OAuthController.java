@@ -32,6 +32,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.Gson;
 import com.shomop.crm.model.DDEditionInfo;
+import com.shomop.crm.model.crm.User;
+import com.shomop.crm.service.UserManager;
 import com.shomop.dd.sdk.DDClient;
 import com.shomop.exception.MailException;
 import com.shomop.http.factory.HttpClientFactory;
@@ -49,6 +51,8 @@ public class OAuthController {
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private DDClient ddClient;
+	@Autowired
+	private UserManager userManager;
 	
 	private static final String AUTH_CODE_URL_PREFIX = "http://oauth.dangdang.com/authorize?";
 	private static final String AUTH_TOKEN_URL_PREFIX = "http://oauth.dangdang.com/token?";
@@ -191,9 +195,9 @@ public class OAuthController {
 	public void getPeople(PrintWriter writer){
 		 MailInfo mailInfo = new MailInfo(false,false);
 		 mailInfo.addTo("710709510@qq.com");
-		 mailInfo.setTitle("测试邮件");
+		 mailInfo.setTitle("测试");
 		 mailInfo.setContent("测试邮件");
-		 mailInfo.setFromPersonal("薛晓冬");
+//		 mailInfo.setFromPersonal("薛晓冬");
 //		 mailInfo.setContent("<h1 style=\"text-align:center;\">夏猫科技新功能上线，诚邀内测</h1><p>&nbsp;夏猫官方订购地址：</p><p>&nbsp;&nbsp;<a href=\"http://fuwu.taobao.com/ser/detail.htm?service_code=FW_GOODS-1865656\" target=\"_blank\">http://fuwu.taobao.com/ser/detail.htm?service_code=FW_GOODS-1865656</a></p>");
 		 try {
 			MailSender.sendMail(mailInfo);
@@ -203,6 +207,10 @@ public class OAuthController {
 		}
 	}
 	
+	@RequestMapping(value = "/register", method = RequestMethod.GET)
+	public void saveUser(User user){
+		userManager.save(user);
+	}
 	
 	public static String toString(HttpEntity entity, String charset) throws IOException, ParseException {
 		if (entity == null) {

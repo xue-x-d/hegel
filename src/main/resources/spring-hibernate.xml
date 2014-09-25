@@ -92,8 +92,12 @@
 	<!-- 注解事务
     <tx:annotation-driven transaction-manager="txManager" proxy-target-class="true" />
      -->
-     
-    <!-- 自动为那些配置@aspectJ切面的bean创建代理，织入切面.
-    <aop:aspectj-autoproxy proxy-target-class="true" />-->
+	<!-- service aop xml -->
+	<bean id="serviceAspecBean" class="com.shomop.util.log.xml.ServiceLogAspect"></bean>
+	<aop:config>
+		<aop:aspect id="afterThrowingAdviceAspect" ref="serviceAspecBean" order="2">
+			<aop:after-throwing pointcut-ref="bussinessService" method="doRecoverActions" throwing="ex" />
+		</aop:aspect>
+	</aop:config>
     
  </beans>

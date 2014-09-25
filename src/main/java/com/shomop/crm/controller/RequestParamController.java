@@ -218,7 +218,7 @@ public class RequestParamController {
 	}
 	
 	@RequestMapping(params={"method=testExc"} ,value = "test", method = RequestMethod.GET)
-    public void test() {  
+    public void test() throws BaseException {  
         throw new BaseException(BaseException.ERROR_SYSTEM,"全局配置出错！");  
     } 
 }

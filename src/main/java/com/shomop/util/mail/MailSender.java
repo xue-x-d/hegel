@@ -1,6 +1,7 @@
 package com.shomop.util.mail;
 
 
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.util.Date;
@@ -22,6 +23,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.MimeUtility;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -48,7 +50,7 @@ public class MailSender {
 	public static boolean sendMail(MailInfo mailInfo) throws MailException{
 		if(mailInfo == null){
 			logger.error(">>> mailinfo not exist!");
-			throw new MailException("mailInfo is null");
+			throw new NullPointerException("mailInfo is null.");
 		}
 		Session mailSession = null;
 		// 考虑到不可能使用常见邮件服务器，所以缓存常见服务器及端口没有实际意义
@@ -80,25 +82,29 @@ public class MailSender {
 				InternetAddress address = new InternetAddress();
 				address.setAddress(mailSession.getProperty("mail.from"));
 				address.setPersonal(mailInfo.getFromPersonal(), Charset.forName("UTF-8").name());
+				System.out.println(address.toString());
 				mailMessage.setFrom(address);
 			}
 			List<String> tos = mailInfo.getTo();
-			if (tos.size() > 0) {
-				Address[] toAdds = new InternetAddress[mailInfo.getTo().size()];
-				for (int i = 0; i < tos.size(); i++) {
-					try {
-						toAdds[i] = new InternetAddress(tos.get(i));
-					} catch (AddressException e) {
-						if (logger.isDebugEnabled()) {
-							logger.debug(">>> invalid email to recipient address."
-									+ "from address: "+ mailInfo.getFromAddress()
-									+ ",subject : "+ mailInfo.getTitle()
-									+ ",invalid address: "+ tos.get(i));
-						}
+			Address[] toAdds = new InternetAddress[mailInfo.getTo().size()];
+			for (int i = 0; i < tos.size(); i++) {
+				try {
+					toAdds[i] = new InternetAddress(tos.get(i));
+				} catch (AddressException e) {
+					if (logger.isDebugEnabled()) {
+						logger.debug(">>> invalid email to recipient address."
+								+ "from address: " + mailInfo.getFromAddress()
+								+ ",subject : " + mailInfo.getTitle()
+								+ ",invalid address: " + tos.get(i));
 					}
 				}
-				mailMessage.setRecipients(Message.RecipientType.TO,toAdds);
 			}
+			if(toAdds.length == 0){
+				logger.error(">>> mail reveiver is null. ");
+				throw new MailException(MailExceptionCode.RECEIVER_MISS,"To");
+			}
+			//InternetAddress.parse("710709510@qq.com,710709511@qq.com");
+			mailMessage.setRecipients(Message.RecipientType.TO, toAdds);
 			List<String> ccs = mailInfo.getCc();
 			if (ccs.size() > 0) {
 				Address[] ccAdds = new InternetAddress[mailInfo.getCc().size()];
@@ -164,8 +170,9 @@ public class MailSender {
 			throw new MailException(MailExceptionCode.CONFIG_MISS,"serverHost or serverPort");
 		}
 		Properties props = new Properties();
-		props.put("mail.smtp.host", serverHost);// 设置邮件服务器的域名或IP
-		props.put("mail.smtp.port", serverPort);// 设置邮件服务器的端口
+		props.put("mail.smtp.host", serverHost);// 邮件服务器的域名或IP
+		props.put("mail.smtp.port", serverPort);// 邮件服务器的端口
+		props.put("mail.transport.protocol", "smtp");// 发送邮件所使用的协议
 		String timeout = CustomProperty.getContextProperty("mailConnectTimeout");
 		props.put("mail.stmp.timeout",StringUtils.isBlank(timeout)?DEFAULT_CONNECT_TIMEOUT:timeout);
 		Boolean isSSL = Boolean.parseBoolean(CustomProperty.getContextProperty("mailIsSSL"));
@@ -202,6 +209,15 @@ public class MailSender {
 		String fromEmail = CustomProperty.getContextProperty("mailFromAddress");
 		if(StringUtils.isBlank(fromEmail)){
 			throw new MailException(MailExceptionCode.CONFIG_MISS,"mailFromAddress");
+		}
+		String mailPersonal = CustomProperty.getContextProperty("mailPersonal");
+		if(StringUtils.isNotBlank(mailPersonal)){
+			try {
+				mailPersonal = MimeUtility.encodeText("薛晓冬",Charset.forName("UTF-8").name(),null);
+				fromEmail = mailPersonal+"<"+fromEmail+">";
+			} catch (UnsupportedEncodingException e) {
+				logger.error(">>> mail personal charset not be supported! are you kidding me?");
+			}
 		}
 		props.put("mail.from", fromEmail);
 		// debug调试

@@ -1,5 +1,6 @@
 package com.shomop.crm.service.impl;
 
+import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,8 @@ public class UserManagerImpl implements UserManager {
 	
 	@Override
 	public void save(User user) {
-		userDao.saveOrUpdate(user);
+//		userDao.saveOrUpdate(user);
+		throw new HibernateException("test hibernate exception");
 	}
 
 }

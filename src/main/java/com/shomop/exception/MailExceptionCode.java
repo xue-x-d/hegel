@@ -4,7 +4,8 @@ public enum MailExceptionCode {
 
 	CONFIG_MISS(20001,"邮件配置项缺失异常"),
 	SSL_ERROR(20002,"邮件服务器ssl链接异常"),
-	MESSAGE_FAILED(20003,"邮件消息体封装异常");
+	RECEIVER_MISS(20003,"没有收件人异常"),
+	MESSAGE_FAILED(20004,"邮件消息体封装异常");
 	
 	private int code;
 	private String desc;

@@ -142,11 +142,15 @@ public class MailInfo implements Serializable{
 	}
 
 	public void setTo(List<String> to) {
-		this.to = to;
+		if (to != null) {
+			this.to = to;
+		}
 	}
 
 	public void setCc(List<String> cc) {
-		this.cc = cc;
+		if (cc != null) {
+			this.cc = cc;
+		}
 	}
 
 	public boolean isValidate() {

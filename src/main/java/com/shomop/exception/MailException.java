@@ -2,7 +2,10 @@ package com.shomop.exception;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
-
+/**
+ * MailException
+ * 调用者必须做好异常捕获，并响应必要的提示内容 
+ */
 public class MailException extends BaseException{
 	/**
 	 * 
@@ -62,9 +65,7 @@ public class MailException extends BaseException{
 		}
 	}
 	
-	
 	public static void main(String[] args) {
-		
 		try {
 			throw new MailException("abc",new NullPointerException("fsdf"));
 		} catch (MailException e) {
