@@ -63,7 +63,7 @@ public class OAuthController {
 	
 	private static HttpClient httpClient = HttpClientFactory.getHttpClient(3000,3000);
 	
-	@RequestMapping(value = "/index.do", method = RequestMethod.GET)
+	@RequestMapping(value = "/index", method = RequestMethod.GET)
 	public void oauth(HttpServletResponse rsp){
 		if (req_params.size() == 0) {
 			req_params.put("appId", ddClient.getAppKey());
@@ -91,6 +91,7 @@ public class OAuthController {
 			return view;
 		}*/
 		try {
+			modelAndview.addObject("version","dd");
 			Map<String,String> params = new HashMap<String,String>();
 			params.put("appId",ddClient.getAppKey());
 			params.put("grantType","code");
@@ -100,13 +101,15 @@ public class OAuthController {
 			params.put("redirectUrl",REDIRECT_URL);
 			params.put("state","shomop");
 			params.put("view","web");
-			URL rul = sendRequestUtils.buildUrl(AUTH_TOKEN_URL_PREFIX,sendRequestUtils.buildQuery(params,sendRequestUtils.DEFAULT_CHARSET));
+			URL rul = sendRequestUtils.buildUrl(AUTH_TOKEN_URL_PREFIX,
+					sendRequestUtils.buildQuery(params,
+							sendRequestUtils.DEFAULT_CHARSET));
 			HttpPost postMethod = new HttpPost();
 			postMethod.setURI(rul.toURI());
 			HttpResponse rsp = httpClient.execute(postMethod);
 			HttpEntity entity = rsp.getEntity();
-			System.out.println("response body: "+toString(entity,EntityUtils.getContentCharSet(entity)));
-			Map<String,?> result =(Map<String,?>)TaobaoUtils.parseJson(EntityUtils.toString(entity,EntityUtils.getContentCharSet(entity)));
+//			System.out.println("response body: "+toString(entity,EntityUtils.getContentCharSet(entity)));
+			Map<String,?> result =(Map<String,?>)TaobaoUtils.parseJson(EntityUtils.toString(entity));
 			for (String key : result.keySet()) {
 				 System.out.println(key + "——>" + result.get(key));
 			}

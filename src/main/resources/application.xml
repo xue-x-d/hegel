@@ -40,6 +40,15 @@
 		<constructor-arg index="2" type="java.lang.String"
 			value="${dd.secret}" />
 	</bean>
+	
+	<bean id="JdClient" class="com.shomop.jd.sdk.JDClient">
+		<constructor-arg index="0" type="java.lang.String"
+			value="${jd.serverUrl}" />
+		<constructor-arg index="1" type="java.lang.String"
+			value="${jd.appkey}" />
+		<constructor-arg index="2" type="java.lang.String"
+			value="${jd.secret}" />
+	</bean>
 
 	<bean id="testInjection" class="com.shomop.crm.service.additional.TestInjection"
 		abstract="true" init-method="initMethod">

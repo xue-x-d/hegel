@@ -260,21 +260,6 @@
 		<version>2.3.4.726</version>
 	</dependency>
 	<dependency>
-		<groupId>com.jd.api</groupId>
-		<artifactId>jd-sdk</artifactId>
-		<version>2.0</version>
-	</dependency>
-	<dependency>
-		<groupId>org.codehaus.jackson</groupId>
-		<artifactId>jackson-mapper-asl</artifactId>
-		<version>1.8.1</version>
-	</dependency>
-	<dependency>
-		<groupId>org.codehaus.jackson</groupId>
-		<artifactId>jackson-core-asl</artifactId>
-		<version>1.8.1</version>
-	</dependency>
-	<dependency>
 		<groupId>org.hibernate</groupId>
 		<artifactId>hibernate-ehcache</artifactId>
 		<version>4.2.0.Final</version>
@@ -349,6 +334,26 @@
 		<groupId>commons-io</groupId>
 		<artifactId>commons-io</artifactId>
 		<version>2.4</version>
+	</dependency>
+	 <dependency>
+      <groupId>com.jd.api</groupId>
+      <artifactId>sdk</artifactId>  
+      <version>2.0</version> 
+    </dependency>
+    <dependency>
+		<groupId>org.codehaus.jackson</groupId>
+		<artifactId>jackson-mapper-asl</artifactId>
+		<version>1.8.1</version>
+	</dependency>
+	<dependency>
+		<groupId>org.codehaus.jackson</groupId>
+		<artifactId>jackson-core-asl</artifactId>
+		<version>1.8.1</version>
+	</dependency>
+	<dependency>
+	  <groupId>jd.comet.client</groupId>
+	  <artifactId>api</artifactId>
+      <version>0.0.1</version>
 	</dependency>
   </dependencies>
 </project>
