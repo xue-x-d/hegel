@@ -16,14 +16,15 @@ public class AllInterceptor implements WebRequestInterceptor {
 
 	@Override
 	public void postHandle(WebRequest request, ModelMap model) throws Exception {
-		// TODO Auto-generated method stub
+		 
 		
 	}
 
 	@Override
 	public void afterCompletion(WebRequest request, Exception ex)
 			throws Exception {
-		// TODO Auto-generated method stub
+		 
+		
 		
 	}
 

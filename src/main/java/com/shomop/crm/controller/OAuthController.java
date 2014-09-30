@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -18,8 +19,10 @@ import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.CharArrayBuffer;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +46,7 @@ import com.shomop.util.mail.MailInfo;
 import com.shomop.util.mail.MailSender;
 import com.taobao.api.internal.util.TaobaoUtils;
 
-@Controller()
+@Controller
 @RequestMapping(value="/oauth")
 @SuppressWarnings("unchecked")
 public class OAuthController {
@@ -57,7 +60,7 @@ public class OAuthController {
 	private static final String AUTH_CODE_URL_PREFIX = "http://oauth.dangdang.com/authorize?";
 	private static final String AUTH_TOKEN_URL_PREFIX = "http://oauth.dangdang.com/token?";
 	// 对于Server-side flow，redirect_uri是必选参数，并且要求redirect_uri与callback的顶级域名一致。
-	private static final String REDIRECT_URL = "http://183.157.94.219:9090/jd-service/oauth/callback";
+	private static final String REDIRECT_URL = "http://183.157.94.219:9090/jd-service/oauth/callback.do";
 	
 	private static final Map<String,String> req_params = new HashMap<String,String>();
 	
@@ -73,7 +76,7 @@ public class OAuthController {
 			req_params.put("view", "web");
 		}
 		try {
-			String query = sendRequestUtils.buildQuery(req_params,sendRequestUtils.DEFAULT_CHARSET);
+			String query = sendRequestUtils.buildQuery(req_params,HTTP.UTF_8);
 			logger.info(query);
 			rsp.sendRedirect(AUTH_CODE_URL_PREFIX+query);
 		} catch (Exception e) {
@@ -102,16 +105,17 @@ public class OAuthController {
 			params.put("state","shomop");
 			params.put("view","web");
 			URL rul = sendRequestUtils.buildUrl(AUTH_TOKEN_URL_PREFIX,
-					sendRequestUtils.buildQuery(params,
-							sendRequestUtils.DEFAULT_CHARSET));
+					sendRequestUtils.buildQuery(params,HTTP.UTF_8));
 			HttpPost postMethod = new HttpPost();
 			postMethod.setURI(rul.toURI());
 			HttpResponse rsp = httpClient.execute(postMethod);
 			HttpEntity entity = rsp.getEntity();
-//			System.out.println("response body: "+toString(entity,EntityUtils.getContentCharSet(entity)));
-			Map<String,?> result =(Map<String,?>)TaobaoUtils.parseJson(EntityUtils.toString(entity));
-			for (String key : result.keySet()) {
-				 System.out.println(key + "——>" + result.get(key));
+			JSONObject json = new JSONObject(EntityUtils.toString(entity));
+			Field field = JSONObject.class.getDeclaredField("map");
+			field.setAccessible(true);
+			Map<Object,Object> result =(Map<Object,Object>)field.get(json);
+			for (Object key : result.keySet()) {
+				System.out.println(key + "——>" + result.get(key));
 			}
 			modelAndview.addObject("map",result);
 			modelAndview.setViewName("oauth_success");

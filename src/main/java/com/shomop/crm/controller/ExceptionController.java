@@ -67,16 +67,6 @@ public class ExceptionController {
 	
 	public static void main(String[] args) {
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 		LinkedHashMap<String,String> map = new LinkedHashMap<String,String>();
 		map.put("1","a");
 		map.put("3","c");
@@ -85,23 +75,5 @@ public class ExceptionController {
 			String key = it.next();
 			System.out.println(key + "=" + map.get(key));
 		}
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 	}
 }

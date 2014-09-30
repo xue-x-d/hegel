@@ -46,7 +46,7 @@ public class User implements Identifier<String>, Cloneable {
 	private int purchaseVersion; // 购买版本
 	private long sid;// 店铺id,shop+sid.taobao.com
 	private long lastDownBuyerTime;
-	private List<String> params;
+	private List<Object> params;
 
 	// private long level;
 	@Id
@@ -274,11 +274,11 @@ public class User implements Identifier<String>, Cloneable {
 	// }
 
 	@Transient
-	public List<String> getParams() {
+	public List<Object> getParams() {
 		return params;
 	}
 
-	public void setParams(List<String> params) {
+	public void setParams(List<Object> params) {
 		this.params = params;
 	}
 	

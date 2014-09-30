@@ -10,8 +10,8 @@
 <title>oauth failed</title>
 </head>
 <body>
-    <p align="center">授权失败</p>
-     <p align="center">
+    <h2 align="center">授权失败</h2>
+     <p align="justify" style="">
         <!-- 是不是应该更简单直接从服务器传递url -->
 		<c:choose>
 			<c:when test="${requestScope.version=='dd'}">
@@ -23,8 +23,13 @@
 			 	<!--  <a title="点击重试" href="<%=path%>/jd/index.do">重试</a>-->
    			</c:otherwise>
 		</c:choose>
-		<c:out value="<%=path%>/${url}"/> <br />
-		<c:out value="${requestScope.error}" default="" />
+		<c:out value="${requestScope.error}" default="" /> <br />
+		<c:forEach items="${map}" var="entry">
+			<c:out value="${entry.key}" /> 
+			<c:out value="${entry.value}" /><br/>
+		</c:forEach>
+		<c:url context="/jd-service" value="/${url}" var="refreshUrl" />
+		<a href="${refreshUrl}" title="重试">retry</a>
 	 </p>
 </body>
 </html>

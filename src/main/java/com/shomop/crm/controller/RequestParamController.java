@@ -24,7 +24,7 @@ import com.google.gson.Gson;
 import com.shomop.crm.model.crm.User;
 import com.shomop.exception.BaseException;
 
-@Controller()
+@Controller
 @RequestMapping(value="/req")
 @SessionAttributes(types={User.class},value={"user"})
 public class RequestParamController {

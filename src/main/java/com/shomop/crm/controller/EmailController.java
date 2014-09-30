@@ -1,7 +1,7 @@
 package com.shomop.crm.controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
@@ -29,7 +29,7 @@ public class EmailController {
 	private static Gson gson = new Gson();
 	
 	@RequestMapping(value = "/sendEmail", method = RequestMethod.POST)
-	public String sendEmail(@Validated MailInfo mailInfo,BindingResult result,ModelMap map){
+	public String sendEmail(@Validated MailInfo mailInfo,BindingResult result,Model map){
 		if (result.hasErrors()) {
 	        return "failed";
 	    }
@@ -50,7 +50,11 @@ public class EmailController {
         binder.setValidator(new MailInfoValidator());  
     }
 	
-	 
+	@RequestMapping(value = "/index", method = RequestMethod.GET)
+	public String index(){
+		
+		return "sendMail";
+	} 
 	
 	
 }
