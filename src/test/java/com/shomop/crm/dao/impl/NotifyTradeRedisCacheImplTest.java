@@ -1,9 +1,8 @@
 package com.shomop.crm.dao.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-
-import junit.textui.TestRunner;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +11,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 import com.shomop.common.cache.CacheException;
-import com.shomop.crm.dao.impl.GsonRedisSeriaziler;
-import com.shomop.crm.dao.impl.NotifyTradeRedisCacheImpl;
 import com.shomop.crm.model.notify.DDNotifyTrade;
+import com.shomop.util.DateUtils;
 
 @ContextConfiguration(locations = {"classpath:application.xml","classpath:spring-hibernate.xml"})
 public class NotifyTradeRedisCacheImplTest extends AbstractJUnit4SpringContextTests {
@@ -25,7 +23,7 @@ public class NotifyTradeRedisCacheImplTest extends AbstractJUnit4SpringContextTe
 	/** 
      * 批量新增
      */  
-    @Test  
+    //@Test  
     public void testAddUsers1() { 
     	System.out.println(notifyTradeRedisCache);
         List<DDNotifyTrade> list = new ArrayList<DDNotifyTrade>(20);  
@@ -82,5 +80,22 @@ public class NotifyTradeRedisCacheImplTest extends AbstractJUnit4SpringContextTe
 		}
     	System.out.println("gs: "+(System.currentTimeMillis() - start)+" ms");
     }
+    
+    @Test  
+    public void testAddUsers() { 
+    	long begin = System.currentTimeMillis();
+        for (int i = 10; i < 20; i++) {  
+        	DDNotifyTrade trade = new DDNotifyTrade();
+        	trade.setTid(Long.valueOf(10+""+i));
+        	trade.setUserId(Long.valueOf(20));
+        	notifyTradeRedisCache.putNTrade(trade);
+        }
+        //耗时： 137
+        System.out.println("耗时： "+(System.currentTimeMillis() -  begin));  
+    }
+    public static void main(String[] args) {
+		
+    	System.out.println(DateUtils.getEndTime(new Date()).getTime()-new Date().getTime());
+	}
 
 }

@@ -1,6 +1,7 @@
 package com.shomop.crm.dao.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.dao.DataAccessException;
@@ -13,6 +14,7 @@ import com.shomop.common.cache.CacheException;
 import com.shomop.common.cache.RedisCacheImpl;
 import com.shomop.crm.dao.NotifyTradeRedisCache;
 import com.shomop.crm.model.notify.DDNotifyTrade;
+import com.shomop.util.DateUtils;
 
 @Repository("notifyTradeRedisCache")
 public class NotifyTradeRedisCacheImpl extends RedisCacheImpl<String,DDNotifyTrade> implements NotifyTradeRedisCache{
@@ -145,8 +147,42 @@ public class NotifyTradeRedisCacheImpl extends RedisCacheImpl<String,DDNotifyTra
 
 	@Override
 	public boolean putNTrade(DDNotifyTrade trade) {
-		
-		return false;
+		if (trade != null) {
+			try {
+				final String key = "user:" + trade.getUserId();
+				boolean flag = exists(key);
+				put(key,trade);
+				if (!flag) {
+					expireAt(key,DateUtils.getEndTime(new Date()).getTime() / 1000);
+				}
+			} catch (Exception e) {
+				logger.error(">>> cache notify trade error.tid:" + trade.getTid(),e);
+				return false;
+			}
+		}
+		return true;
 	}
+	
+	private boolean exists(final String key) throws CacheException {
+    	return redisTemplate.execute(new RedisCallback<Boolean>() {
+			@Override
+			public Boolean doInRedis(RedisConnection connection)
+					throws DataAccessException {
+				byte[] _key = getStringRedisSerializer().serialize(key);
+				return connection.exists(_key);
+			}
+		}); 
+    }
+	
+	private boolean expireAt(final String key,final long endTime) throws CacheException {
+    	return redisTemplate.execute(new RedisCallback<Boolean>() {
+			@Override
+			public Boolean doInRedis(RedisConnection connection)
+					throws DataAccessException {
+				byte[] _key = getStringRedisSerializer().serialize(key);
+				return connection.expireAt(_key,endTime);
+			}
+		}); 
+    }
     
 }
