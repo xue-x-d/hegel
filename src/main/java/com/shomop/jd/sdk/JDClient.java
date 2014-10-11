@@ -4,6 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.google.gson.Gson;
 import com.jd.open.api.sdk.JdClient;
 import com.jd.open.api.sdk.JdException;
 import com.jd.open.api.sdk.internal.parser.Parser;
@@ -22,10 +26,11 @@ import com.jd.open.api.sdk.response.AbstractResponse;
  */
 @SuppressWarnings("unchecked")
 public class JDClient implements JdClient{
-
+	private static final Log logger = LogFactory.getLog(JDClient.class);
 	private static final String CHARSET_UTF8 = "UTF-8";
 	private static final String JSON_PARAM_KEY = "360buy_param_json";
 	private static final String OTHER_PARAM_KEY = "other";
+	private static final Gson gson = new Gson();
 	private final String serverUrl;
 	private final String appKey;
 	private final String appSecret;
@@ -69,14 +74,23 @@ public class JDClient implements JdClient{
 				rsp = HttpUtil.doPost(url, params, this.connectTimeout,
 						this.readTimeout);
 			}
-			T resp = parse(rsp, request.getResponseClass());
+			T resp = null;
+			try{
+				resp = parse(rsp, request.getResponseClass());	
+			}catch(RuntimeException e){
+				logger.error("^_^"+rsp);
+				throw e;
+			}
 			StringBuffer sb = new StringBuffer();
 			sb.append(url).append("&").append("360buy_param_json").append("=")
 					.append(json);
 			resp.setUrl(sb.toString());
+			if(!resp.getCode().equals("0")){
+				logger.error(errorScene(resp,session));
+			}
 			return resp;
 		} catch (Exception e) {
-			throw new JdException("服务器连接超时，请重试");
+			throw new JdException("请求出错，请重试");
 		}
 	}
 
@@ -109,8 +123,7 @@ public class JDClient implements JdClient{
 		return parser.parse(rsp, responseClass);
 	}
 
-	private String sign(Map<String, String> pmap, String appSecret)
-			throws Exception {
+	private String sign(Map<String, String> pmap, String appSecret) throws Exception {
 		StringBuilder sb = new StringBuilder(appSecret);
 		for (Map.Entry<String,String> entry : pmap.entrySet()) {
 			String name = entry.getKey();
@@ -124,11 +137,36 @@ public class JDClient implements JdClient{
 		return result;
 	}
 
+	/**
+	 * Don't invoke this method.
+	 * @return always return <code>null</code>
+	 */
 	@Override
 	public <T extends AbstractResponse> T execute(JdRequest<T> paramJdRequest)
 			throws JdException {
 		 
 		return null;
+	}
+	
+	private String errorScene(AbstractResponse resp,String session) {
+		if(resp == null){
+			return "";
+		}
+		StringBuilder log = new StringBuilder();
+		log.append("ErrorScene");
+		log.append("^_^");
+		log.append(resp.getCode());
+		log.append("^_^");
+		log.append(resp.getEnDesc());
+		log.append("^_^");
+		log.append("session");
+		log.append("****");
+		log.append(session);
+		log.append("****");
+		log.append("^_^");
+		log.append("Body:");
+		log.append(gson.toJson(resp));
+		return log.toString();
 	}
  
 }
