@@ -43,7 +43,7 @@ public class JdOAuthController {
 	private static final String AUTH_CODE_URL_PREFIX = "https://auth.360buy.com/oauth/authorize?";
 	private static final String AUTH_TOKEN_URL_PREFIX = "https://auth.360buy.com/oauth/token?";
 	// callback的顶级域名一致。
-	private static final String REDIRECT_URL = "http://125.119.155.174:9090/jd-service/jd/callback.do";
+	private static final String REDIRECT_URL = "http://125.119.159.222:9090/jd-service/jd/callback.do";
 	
 	private static HttpClient httpClient = HttpClientFactory.getHttpClient(3000,3000);
 	
@@ -137,6 +137,7 @@ public class JdOAuthController {
 				.append("grant_type").append("=").append("refresh_token")
 				.append("&").append("refresh_token").append("=")
 				.append(refreshToken);
+		System.out.println(params.toString());
 		try {
 			HttpPost postMethod = new HttpPost(AUTH_TOKEN_URL_PREFIX + params.toString());
 			HttpResponse rsp = httpClient.execute(postMethod);
@@ -149,7 +150,7 @@ public class JdOAuthController {
 				System.out.println(key + "——>" + result.get(key));
 			}
 			model.addAttribute("map", result);
-			if ((Integer)result.get("code") == 0) {
+			if (result.get("code").equals("0")) {
 				return "oauth_success";
 			}
 		} catch (Exception e) {

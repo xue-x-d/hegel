@@ -156,7 +156,8 @@ public class TestHttpClient {
 		user.setParams(params);
 		JSONObject jo = new JSONObject(user);
 		System.out.println(jo.toString());
-		String jsonStr = "{\"sid\":0,\"username\":\"张飞\",\"subscribeBriefing\":false,\"mktBalance\":0,\"isPermit\":false,\"lastDownBuyerTime\":0,\"userId\":0,\"appBalance\":0,\"params\":[\"1\",\"2\"],\"deleted\":false,\"purchaseVersion\":0}";
+		String jsonStr = "{\"sid\":0,\"username\":\"张\\t飞\",\"subscribeBriefing\":false,\"mktBalance\":0,\"isPermit\":false,\"lastDownBuyerTime\":0,\"userId\":0,\"appBalance\":0,\"params\":[\"1\",\"2\"],\"deleted\":false,\"purchaseVersion\":0}";
+		System.out.println(jsonStr);
 		JSONObject jo2 = new JSONObject(jsonStr);
 		for (Object object : jo2.keySet()) {
 			System.out.println(object+"  "+jo2.optString(object.toString()));

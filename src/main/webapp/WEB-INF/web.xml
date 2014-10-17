@@ -36,6 +36,15 @@
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
+
+  <servlet>
+	 <servlet-name>jd-refresh</servlet-name>
+	 <servlet-class>com.shomop.crm.controller.RefreshTokenServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>jd-refresh</servlet-name>
+    <url-pattern>/refresh.html</url-pattern>
+  </servlet-mapping>
    
   <servlet-mapping>
     <servlet-name>web-app</servlet-name>
