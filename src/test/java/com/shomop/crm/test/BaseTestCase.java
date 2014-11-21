@@ -5,6 +5,7 @@ import org.hibernate.SessionFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.transaction.TransactionConfiguration;
@@ -13,6 +14,7 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
  * @author spencer.xue
  * @date 2014-6-19
  */
+@ActiveProfiles("develop")
 @ContextConfiguration(locations = {"classpath:application.xml","classpath:spring-hibernate.xml"})
 @TransactionConfiguration(defaultRollback = true,transactionManager="txManager")
 public class BaseTestCase extends AbstractTransactionalJUnit4SpringContextTests {

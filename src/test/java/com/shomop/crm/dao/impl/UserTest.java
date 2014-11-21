@@ -145,7 +145,7 @@ public class UserTest extends BaseTestCase {
 	 * 所以，如果要使用查询缓存，我们一定也要开启我们的二级缓存，这样就不会出现 N+1 问题了
 	 * 
 	 */
-	//@Test
+	@Test
 	public void testQueryCache() {
 		Session session = null;
 		try {
@@ -208,7 +208,7 @@ public class UserTest extends BaseTestCase {
 	/**
 	 * 测试方法
 	 */
-	@Test
+	//@Test
 	@Rollback(value=false)
 	@Transactional(readOnly=false,value="txManager")
 	public void testLoadUser(){

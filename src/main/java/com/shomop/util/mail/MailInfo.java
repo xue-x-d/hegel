@@ -5,6 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.http.annotation.NotThreadSafe;
+
+/**
+ * 邮件发送体
+ * @author spencer.xue
+ * @date 2014-11-19
+ */
+@NotThreadSafe
 public class MailInfo implements Serializable{
 
 	/**
@@ -17,7 +25,7 @@ public class MailInfo implements Serializable{
 	private String fromAddress;// 发件人地址
 	private String fromPersonal;// 发件人名称
 	private List<String> to;// 收件人列表
-	private List<String> cc;// 抄送人列表
+	private List<String> cc;// 抄送人列表默认为空
 	private String username;// 发件人用户名
 	private String password;// 发件人密码
 	private String title;// 邮件的主题
@@ -25,7 +33,7 @@ public class MailInfo implements Serializable{
 	private boolean validate; // 是否需要身份验证
 	private boolean htmlBody;// html格式邮件
 	private boolean SSL; // ssl链接方式
-	private List<String> attachments;// 附件路径列表
+	private List<String> attachments;// 附件路径列表默认为空
 	private Properties prop; 
 	
 	public MailInfo() {
@@ -41,8 +49,6 @@ public class MailInfo implements Serializable{
 		this.validate = validate;
 		this.prop = new Properties();
 		this.to = new ArrayList<String>();
-		this.cc = new ArrayList<String>();
-		this.attachments = new ArrayList<String>();
 	}
 	
 	public Properties getProperties() {
@@ -138,7 +144,9 @@ public class MailInfo implements Serializable{
 	}
 
 	public void setAttachments(List<String> attachments) {
-		this.attachments = attachments;
+		if (attachments != null) {
+			this.attachments = attachments;
+		}
 	}
 
 	public void setTo(List<String> to) {

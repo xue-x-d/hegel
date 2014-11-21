@@ -29,7 +29,7 @@ public class SI_ItemTest extends BaseTestCase {
 		session.save(item);
 	}
 	
-	@Test
+	//@Test
 	@SuppressWarnings("unchecked")
 	public void testGet(){
 		Session session = getCurrentSession();

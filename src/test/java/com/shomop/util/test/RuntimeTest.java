@@ -20,23 +20,23 @@ public class RuntimeTest {
 	 */
 	private static Runtime runTime = Runtime.getRuntime();
 
-	// @Test
+	//@Test
 	public void testShutdownHook() {
 		runTime.addShutdownHook(new Thread() {
 			@Override
 			public void run() {
-
+				
 				System.out.println("java shutdown");
 			}
 		});
 		System.out.println("aaa");
-		// System.exit(0);
-		// runTime.halt(0);
+		System.exit(0);// Runtime.getRuntime().exit(0)
+		//runTime.halt(0);
 		System.out.println("bbbbbb");
 
 	}
 
-	// @Test
+	@Test
 	public void testExecu() throws IOException, InterruptedException {
 
 		String str;
@@ -50,11 +50,11 @@ public class RuntimeTest {
 
 	}
 
-	@Test
+	//@Test
 	public void testCase() throws IOException, InterruptedException {
 
 		Runtime runtime = Runtime.getRuntime();
-		String[] commandArgs = { "notepad.exe", "Z:/test.txt" };
+		String[] commandArgs = { "notepad.exe", "D:/navicat activation code.txt" };
 		final Process process = runtime.exec(commandArgs);
 		new Thread(new Runnable() {
 			@Override

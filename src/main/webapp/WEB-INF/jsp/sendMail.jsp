@@ -10,19 +10,18 @@
 <script charset="utf-8" src="../editor/kindeditor.js"></script>
 <script charset="utf-8" src="../editor/lang/zh_CN.js"></script>
 <script type="text/javascript">
-var editor;
-//关闭过滤模式，保留所有标签
-KindEditor.options.filterMode = true;
-KindEditor.ready(function(K) {
-        editor = K.create('#editor_id', {
-                themeType : 'simple'
-        });
-});
+	var editor;
+	//关闭过滤模式，保留所有标签
+	KindEditor.options.filterMode = true;
+	KindEditor.ready(function(K) {
+		editor = K.create('#editor_id', {
+			themeType : 'simple'
+		});
+	});
 
-function sendData(){
-	alert(editor.html());
-}
-
+	function sendData() {
+		alert(editor.html());
+	}
 </script>
 </head>
 <body>

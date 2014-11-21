@@ -329,10 +329,6 @@ public abstract class GenericDaoImpl<T extends Identifier<I>, I extends Serializ
 					stmt.addBatch();
 				}
 				stmt.executeBatch();
-				/*int[] result = stmt.executeBatch();
-				for (int i = 0; i < result.length; i++) {
-					System.out.println(result[i]);
-				}*/
 			}
 		});
 	}
@@ -366,24 +362,6 @@ public abstract class GenericDaoImpl<T extends Identifier<I>, I extends Serializ
     			fieldList.add(field);
  			}
     	}
-    	// 现有@Id注解都在方法上
-//    	if(idField == null){
-//          Method[] mothods = type.getDeclaredMethods();
-//			for (Method method : mothods) {
-//				Id id = method.getAnnotation(Id.class);
-//				if (id != null) {
-//					String idString = method.getName().replace("get", "");
-//					idString = idString.substring(0,1).toLowerCase() + idString.substring(1);
-//					try {
-//						Field temp = type.getDeclaredField(idString);
-//						idField = temp;
-//					} catch (Exception e) {
-//						e.printStackTrace();
-//					}
-//					break;
-//				}
-//			}
-//    	}
     	if(idField == null){
     		throw new IllegalStateException(type.getAnnotation(Table.class).name()+" table has not a primary key");
     	}
@@ -596,7 +574,11 @@ public abstract class GenericDaoImpl<T extends Identifier<I>, I extends Serializ
 				// 主键默认uuid
 				if(field.getAnnotation(Id.class) != null || 
 						field.getName().equals(BatchSaveIgnore.defaultIdName)){
-					stmt.setObject(i+1, UUID.generate().toString());
+					if (field.getType() == String.class) {
+						stmt.setObject(i + 1, UUID.generate().toString());
+					} else {
+						stmt.setObject(i + 1, null);
+					}
 					continue;
 				}
 				Object object = field.get(bean);

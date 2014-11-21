@@ -25,7 +25,6 @@ import org.junit.Test;
 
 import com.google.gson.Gson;
 import com.shomop.crm.model.crm.User;
-import com.shomop.http.factory.HttpClientFactory;
 
 public class TestHttpClient {
 
@@ -37,7 +36,7 @@ public class TestHttpClient {
 	
 	@BeforeClass    
     public static void beforeClass() {     
-		httpClient = HttpClientFactory.getHttpClient();
+		httpClient = new DefaultHttpClient();
 		gson = new Gson();
     }
     
@@ -129,7 +128,7 @@ public class TestHttpClient {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void testSession() {
 		HttpClient client = new DefaultHttpClient();
 		HttpGet get = new HttpGet("http://localhost:8080/jd-service/req/session?id=refuser&username=xxd");
@@ -144,7 +143,8 @@ public class TestHttpClient {
 		}
 	}
 	
-	public static void main(String[] args) {
+	@Test
+	public void testJSONParse() {
 		
 		JSONObject jsonObject = new JSONObject("{\"extends\":[{\"content\":\"尊敬的用户：您有一条锁定订单，请您关注。订单号为：1234567898，下单时间为：2014-08-28 14:37:33 000：收货人为：张三，订单金额为：5090.0。请您及时处理，谢谢。\",\"pin\":\"zhangsan\",\"time\":\"2014-08-28 14:47:05 860\",\"type\":\"orderlock\",\"venderid\":\"12345\"}]}");
 		System.out.println(jsonObject.opt("extends"));
@@ -161,8 +161,7 @@ public class TestHttpClient {
 		JSONObject jo2 = new JSONObject(jsonStr);
 		for (Object object : jo2.keySet()) {
 			System.out.println(object+"  "+jo2.optString(object.toString()));
-		}
-		
+		}	
 	}
 	
 }

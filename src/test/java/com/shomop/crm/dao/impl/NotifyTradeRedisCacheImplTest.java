@@ -7,13 +7,14 @@ import java.util.List;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 import com.shomop.common.cache.CacheException;
 import com.shomop.crm.model.notify.DDNotifyTrade;
 import com.shomop.util.DateUtils;
-
+@ActiveProfiles("develop")
 @ContextConfiguration(locations = {"classpath:application.xml","classpath:spring-hibernate.xml"})
 public class NotifyTradeRedisCacheImplTest extends AbstractJUnit4SpringContextTests {
 	

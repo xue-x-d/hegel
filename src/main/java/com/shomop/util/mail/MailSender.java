@@ -1,7 +1,6 @@
 package com.shomop.util.mail;
 
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.util.Date;
@@ -23,7 +22,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import javax.mail.internet.MimeUtility;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -69,7 +67,7 @@ public class MailSender {
 		}else{
 			mailSession = getSystemMailSession();
 			if (logger.isDebugEnabled()) {
-				logger.debug(">>> user system default mail server.mailSession : "+ mailSession.toString());
+				logger.debug(">>> use system default mail server.mailSession : "+ mailSession.toString());
 			}
 		}
 		if (logger.isDebugEnabled()) {
@@ -82,7 +80,9 @@ public class MailSender {
 				InternetAddress address = new InternetAddress();
 				address.setAddress(mailSession.getProperty("mail.from"));
 				address.setPersonal(mailInfo.getFromPersonal(), Charset.forName("UTF-8").name());
-				System.out.println(address.toString());
+				if (logger.isDebugEnabled()) {
+					logger.debug(">>> from address: "+address.toString());
+				}
 				mailMessage.setFrom(address);
 			}
 			List<String> tos = mailInfo.getTo();
@@ -106,7 +106,7 @@ public class MailSender {
 			//InternetAddress.parse("710709510@qq.com,710709511@qq.com");
 			mailMessage.setRecipients(Message.RecipientType.TO, toAdds);
 			List<String> ccs = mailInfo.getCc();
-			if (ccs.size() > 0) {
+			if (ccs != null && ccs.size() > 0) {
 				Address[] ccAdds = new InternetAddress[mailInfo.getCc().size()];
 				for (int i = 0; i < ccs.size(); i++) {
 					try {
@@ -210,15 +210,16 @@ public class MailSender {
 		if(StringUtils.isBlank(fromEmail)){
 			throw new MailException(MailExceptionCode.CONFIG_MISS,"mailFromAddress");
 		}
-		String mailPersonal = CustomProperty.getContextProperty("mailPersonal");
+		/*String mailPersonal = CustomProperty.getContextProperty("mailPersonal");
 		if(StringUtils.isNotBlank(mailPersonal)){
 			try {
-				mailPersonal = MimeUtility.encodeText("薛晓冬",Charset.forName("UTF-8").name(),null);
-				fromEmail = mailPersonal+"<"+fromEmail+">";
-			} catch (UnsupportedEncodingException e) {
-				logger.error(">>> mail personal charset not be supported! are you kidding me?");
+				// 不用试了。源码很明显 parse 根本没有解析personal字段。。*^_^*
+				mailPersonal = MimeUtility.encodeText(mailPersonal,Charset.forName("UTF-8").name(),null);
+				fromEmail = mailPersonal+" <"+fromEmail+">";
+			} catch (Exception e) {
+				logger.error(">>> mail personal charset not be supported! Are you kidding me?");
 			}
-		}
+		}*/
 		props.put("mail.from", fromEmail);
 		// debug调试
 		// props.setProperty("mail.debug", "true");
