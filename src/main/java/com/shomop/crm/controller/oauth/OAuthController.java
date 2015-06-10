@@ -1,4 +1,4 @@
-package com.shomop.crm.controller;
+package com.shomop.crm.controller.oauth;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,13 +36,13 @@ import org.springframework.web.servlet.ModelAndView;
 import com.google.gson.Gson;
 import com.shomop.crm.model.DDEditionInfo;
 import com.shomop.crm.model.crm.User;
+import com.shomop.crm.model.email.MailTask;
 import com.shomop.crm.service.UserManager;
 import com.shomop.dd.sdk.DDClient;
 import com.shomop.exception.MailException;
 import com.shomop.http.factory.HttpClientFactory;
 import com.shomop.util.Digest;
 import com.shomop.util.sendRequestUtils;
-import com.shomop.util.mail.MailInfo;
 import com.shomop.util.mail.MailSender;
 import com.taobao.api.internal.util.TaobaoUtils;
 
@@ -200,7 +200,7 @@ public class OAuthController {
 	
 	@RequestMapping(value = "/sendMail", method = RequestMethod.GET)
 	public void getPeople(PrintWriter writer){
-		 MailInfo mailInfo = new MailInfo(false,false);
+		 MailTask mailInfo = new MailTask(false,false);
 		 mailInfo.addTo("710709510@qq.com");
 		 mailInfo.setTitle("测试");
 		 mailInfo.setContent("测试邮件");

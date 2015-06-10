@@ -752,4 +752,18 @@ public abstract class GenericDaoImpl<T extends Identifier<I>, I extends Serializ
         }
         });
     }
+    
+    /**
+     * 根据配置的xml查询结果,并封装成List对象返回,只能执行查询操作
+     * @param sqlId xml中的sql的Id
+     * @param obect 包含参数的对象
+     * @param clazz 返回结果的类型
+     * @return
+     */
+    public <E extends Object> List<E> find(String sqlId,Object object,Class<E> clazz){
+    	/*String sql = SqlConfig.getSql(sqlId, object);
+    	//System.out.println(sql);
+    	return getValueByJDBC(sql, clazz);*/
+    	return null;
+    }
 }

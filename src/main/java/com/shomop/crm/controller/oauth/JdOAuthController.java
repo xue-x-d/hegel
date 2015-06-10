@@ -1,4 +1,4 @@
-package com.shomop.crm.controller;
+package com.shomop.crm.controller.oauth;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
@@ -40,8 +40,8 @@ public class JdOAuthController {
 	@Autowired
 	private UserManager userManager;
 	
-	private static final String AUTH_CODE_URL_PREFIX = "https://auth.360buy.com/oauth/authorize?";
-	private static final String AUTH_TOKEN_URL_PREFIX = "https://auth.360buy.com/oauth/token?";
+	private static final String AUTH_CODE_URL_PREFIX = "https://oauth.jd.com/oauth/authorize?";
+	private static final String AUTH_TOKEN_URL_PREFIX = "https://oauth.jd.com/oauth/token?";
 	// callback的顶级域名一致。
 	private static final String REDIRECT_URL = "http://125.119.159.222:9090/jd-service/jd/callback.do";
 	

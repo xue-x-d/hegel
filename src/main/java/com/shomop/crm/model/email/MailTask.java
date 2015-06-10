@@ -1,11 +1,20 @@
-package com.shomop.util.mail;
+package com.shomop.crm.model.email;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.http.annotation.NotThreadSafe;
+
+import com.shomop.crm.model.Identifier;
+import com.shomop.crm.model.annotation.BatchSaveIgnore;
 
 /**
  * 邮件发送体
@@ -13,50 +22,83 @@ import org.apache.http.annotation.NotThreadSafe;
  * @date 2014-11-19
  */
 @NotThreadSafe
-public class MailInfo implements Serializable{
+@Entity
+@Table(name = "mail_task")
+public class MailTask implements Identifier<Integer> {
 
+	private Integer id;
 	/**
-	 * 
+	 * @see MailUser
 	 */
-	private static final long serialVersionUID = -5100819782699686204L;
-	
+	private Integer userId;
+	/**
+	 * @see MailTaskStatus
+	 */
+	private Integer status; // 邮件发送任务状态
+	private Long created; // 创建件时间
 	private String serverHost;// 邮件服务器域名或IP
 	private String serverPort; // 邮箱服务器端口
 	private String fromAddress;// 发件人地址
 	private String fromPersonal;// 发件人名称
-	private List<String> to;// 收件人列表
-	private List<String> cc;// 抄送人列表默认为空
 	private String username;// 发件人用户名
 	private String password;// 发件人密码
 	private String title;// 邮件的主题
 	private String content;// 邮件的内容
 	private boolean validate; // 是否需要身份验证
 	private boolean htmlBody;// html格式邮件
-	private boolean SSL; // ssl链接方式
-	private List<String> attachments;// 附件路径列表默认为空
-	private Properties prop; 
+	private boolean IsSSL; // ssl链接方式
 	
-	public MailInfo() {
+	@BatchSaveIgnore
+	@Transient private List<String> to;// 收件人列表
+	
+	@BatchSaveIgnore
+	@Transient private List<String> cc;// 抄送人列表默认为空
+	
+	@BatchSaveIgnore
+	@Transient private List<String> attachments;// 附件路径列表默认为空
+	
+	@BatchSaveIgnore
+	@Transient private Properties prop;
+	
+	public MailTask() {
 		this(false, false);
 	}
 
-	public MailInfo(boolean validate) {
+	public MailTask(boolean validate) {
 		this(validate, false);
 	}
 	
-	public MailInfo(boolean validate, boolean isHtmlBody) {
+	public MailTask(boolean validate, boolean isHtmlBody) {
 		this.htmlBody = isHtmlBody;
 		this.validate = validate;
 		this.prop = new Properties();
 		this.to = new ArrayList<String>();
 	}
 	
-	public Properties getProperties() {
+	public Properties properties() {
 		prop.put("mail.smtp.host",this.serverHost);
 		prop.put("mail.smtp.port",this.serverPort);
 		prop.put("mail.smtp.auth", validate ? "true" : "false");
 		prop.put("mail.from", this.fromAddress);
 		return prop;
+	}
+	
+	@Id
+	@GeneratedValue
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	
+	public Integer getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Integer userId) {
+		this.userId = userId;
 	}
 
 	public String getServerHost() {
@@ -82,7 +124,7 @@ public class MailInfo implements Serializable{
 	public void setFromAddress(String fromAddress) {
 		this.fromAddress = fromAddress;
 	}
-
+	@Transient
 	public List<String> getTo() {
 		return to;
 	}
@@ -90,7 +132,7 @@ public class MailInfo implements Serializable{
 	public void addTo(String to) {
 		this.to.add(to);
 	}
-
+	@Transient
 	public List<String> getCc() {
 		return cc;
 	}
@@ -115,6 +157,7 @@ public class MailInfo implements Serializable{
 		this.password = password;
 	}
 
+	@Column(columnDefinition = "varchar(150)",nullable=false)
 	public String getTitle() {
 		return title;
 	}
@@ -123,6 +166,7 @@ public class MailInfo implements Serializable{
 		this.title = title;
 	}
 
+	@Column(columnDefinition = "TEXT")
 	public String getContent() {
 		return content;
 	}
@@ -138,7 +182,8 @@ public class MailInfo implements Serializable{
 	public void setFromPersonal(String fromPersonal) {
 		this.fromPersonal = fromPersonal;
 	}
-
+	
+	@Transient
 	public List<String> getAttachments() {
 		return attachments;
 	}
@@ -177,12 +222,35 @@ public class MailInfo implements Serializable{
 		this.htmlBody = htmlBody;
 	}
 
-	public boolean isSSL() {
-		return SSL;
+	public boolean getIsSSL() {
+		return IsSSL;
 	}
 
-	public void setSSL(boolean sSL) {
-		SSL = sSL;
+	public void setIsSSL(boolean IsSSL) {
+		this.IsSSL = IsSSL;
+	}
+	
+	@Column(columnDefinition="int(11) not null default 0")
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
+	public Long getCreated() {
+		return created;
+	}
+
+	public void setCreated(Long created) {
+		this.created = created;
+	}
+
+
+	public static enum MailTaskStatus {
+
+		CREATE_SUCCESS, WAIT_DELIVERY, DELIVERY_COMPLETE, DELIVERY_FAILED;
 	}
 
 }
