@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" 
+"http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+ 	<!-- 扫描指定包（将 @Component 注解的类自动定义为 Spring Bean） -->
+	<bean id="greetingImpl" class="aop.GreetingImpl" />
+	<bean id="greetingAroundAdvice" class="aop.GreetingAroundAdvice" />
+	
+	<!--<property name="target" ref="greetingImpl"/>-->
+	<!--  
+    <bean id="greetingProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="interfaces" value="aop.Greeting"/>
+        <property name="targetName" value="greetingImpl"/>
+        <property name="interceptorNames" value="greetingAroundAdvice"/> 
+    </bean> -->
+    
+    <!-- 配置一个切面 -->
+    <bean id="greetingAdvisor" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+        <property name="advice" ref="greetingAroundAdvice"/>            <!-- 增强 -->
+        <property name="pattern" value="aop.GreetingImpl.good.*"/> <!-- 切点（正则表达式） -->
+    </bean>
+    
+    <bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+        <property name="beanNames" value="greetingImpl"/>                <!-- 只为后缀是“Impl”的 Bean 生成代理 -->
+        <property name="interceptorNames" value="greetingAroundAdvice"/> <!-- 增强 -->
+        <property name="optimize" value="true"/>                         <!-- 是否对代理生成策略进行优化 -->
+    </bean>
+</beans>

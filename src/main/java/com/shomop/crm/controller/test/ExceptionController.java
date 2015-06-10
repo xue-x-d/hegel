@@ -1,4 +1,4 @@
-package com.shomop.crm.controller;
+package com.shomop.crm.controller.test;
 
 import java.util.HashMap;
 import java.util.Iterator;

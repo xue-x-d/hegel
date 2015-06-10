@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.shomop.crm.model.email.MailTask;
 import com.shomop.exception.MailException;
 import com.shomop.exception.MailExceptionCode;
 import com.shomop.util.ext.CustomProperty;
@@ -45,22 +46,22 @@ public class MailSender {
 	private static Session systemMailSession;
 	
 	
-	public static boolean sendMail(MailInfo mailInfo) throws MailException{
-		if(mailInfo == null){
-			logger.error(">>> mailinfo not exist!");
-			throw new NullPointerException("mailInfo is null.");
+	public static boolean sendMail(MailTask mailTask) throws MailException{
+		if(mailTask == null){
+			logger.error(">>> mailTask not exist!");
+			throw new NullPointerException("mailTask is null.");
 		}
 		Session mailSession = null;
 		// 考虑到不可能使用常见邮件服务器，所以缓存常见服务器及端口没有实际意义
-		if (StringUtils.isNotEmpty(mailInfo.getServerHost())
-				&& StringUtils.isNotEmpty(mailInfo.getServerPort())) {
+		if (StringUtils.isNotEmpty(mailTask.getServerHost())
+				&& StringUtils.isNotEmpty(mailTask.getServerPort())) {
 			Authenticator authenticator = null;
-			Properties prop = mailInfo.getProperties();  
-			if (mailInfo.isValidate()) {
-				authenticator = new MyAuthenticator(mailInfo.getUsername(),
-						mailInfo.getPassword());
+			Properties prop = mailTask.properties();  
+			if (mailTask.isValidate()) {
+				authenticator = new MyAuthenticator(mailTask.getUsername(),
+						mailTask.getPassword());
 			}
-			if(mailInfo.isSSL()){
+			if(mailTask.getIsSSL()){
 				settingSSLConnect(prop);
 			}
 			mailSession = Session.getDefaultInstance(prop, authenticator);
@@ -76,64 +77,64 @@ public class MailSender {
 		Message mailMessage = new MimeMessage(mailSession);
 		// 创建邮件消息体
 		try {
-			if(StringUtils.isNotBlank(mailInfo.getFromPersonal())){
+			if(StringUtils.isNotBlank(mailTask.getFromPersonal())){
 				InternetAddress address = new InternetAddress();
 				address.setAddress(mailSession.getProperty("mail.from"));
-				address.setPersonal(mailInfo.getFromPersonal(), Charset.forName("UTF-8").name());
+				address.setPersonal(mailTask.getFromPersonal(), Charset.forName("UTF-8").name());
 				if (logger.isDebugEnabled()) {
 					logger.debug(">>> from address: "+address.toString());
 				}
 				mailMessage.setFrom(address);
 			}
-			List<String> tos = mailInfo.getTo();
-			Address[] toAdds = new InternetAddress[mailInfo.getTo().size()];
+			List<String> tos = mailTask.getTo();
+			Address[] toAdds = new InternetAddress[mailTask.getTo().size()];
 			for (int i = 0; i < tos.size(); i++) {
 				try {
 					toAdds[i] = new InternetAddress(tos.get(i));
 				} catch (AddressException e) {
 					if (logger.isDebugEnabled()) {
 						logger.debug(">>> invalid email to recipient address."
-								+ "from address: " + mailInfo.getFromAddress()
-								+ ",subject : " + mailInfo.getTitle()
+								+ "from address: " + mailTask.getFromAddress()
+								+ ",subject : " + mailTask.getTitle()
 								+ ",invalid address: " + tos.get(i));
 					}
 				}
 			}
 			if(toAdds.length == 0){
-				logger.error(">>> mail reveiver is null. ");
+				logger.error(">>> mail reveiver is null. taskId: "+mailTask.getId());
 				throw new MailException(MailExceptionCode.RECEIVER_MISS,"To");
 			}
 			//InternetAddress.parse("710709510@qq.com,710709511@qq.com");
 			mailMessage.setRecipients(Message.RecipientType.TO, toAdds);
-			List<String> ccs = mailInfo.getCc();
+			List<String> ccs = mailTask.getCc();
 			if (ccs != null && ccs.size() > 0) {
-				Address[] ccAdds = new InternetAddress[mailInfo.getCc().size()];
+				Address[] ccAdds = new InternetAddress[mailTask.getCc().size()];
 				for (int i = 0; i < ccs.size(); i++) {
 					try {
 						ccAdds[i] = new InternetAddress(ccs.get(i));
 					} catch (AddressException e) {
 						if (logger.isDebugEnabled()) {
 							logger.debug(">>> invalid email cc recipient address."
-									+ "from address: "+ mailInfo.getFromAddress() 
-									+ ",subject : "+ mailInfo.getTitle()
+									+ "from address: "+ mailTask.getFromAddress() 
+									+ ",subject : "+ mailTask.getTitle()
 									+ ",invalid address: " + ccs.get(i));
 						}
 					}
 				}
 				mailMessage.setRecipients(Message.RecipientType.CC,ccAdds);
 			}
-			//mailMessage.setRecipients(Message.RecipientType.TO, mailInfo.getTo().toArray(new Address[0]));
-			//mailMessage.setRecipients(Message.RecipientType.CC, mailInfo.getCc().toArray(new Address[0]));
-			mailMessage.setSubject(mailInfo.getTitle());
+			//mailMessage.setRecipients(Message.RecipientType.TO, mailTask.getTo().toArray(new Address[0]));
+			//mailMessage.setRecipients(Message.RecipientType.CC, mailTask.getCc().toArray(new Address[0]));
+			mailMessage.setSubject(mailTask.getTitle());
 			mailMessage.setSentDate(new Date());
-			if(mailInfo.isHtmlBody()){
+			if(mailTask.isHtmlBody()){
 				// 正文 
 	            Multipart mainPart = new MimeMultipart();  
 	            BodyPart mainBody = new MimeBodyPart();
-	            mainBody.setContent(mailInfo.getContent(), "text/html; charset=utf-8");  
+	            mainBody.setContent(mailTask.getContent(), "text/html; charset=utf-8");  
 	            mainPart.addBodyPart(mainBody);
 	            // 附件
-				for (String path : mailInfo.getAttachments()) {
+				for (String path : mailTask.getAttachments()) {
 					BodyPart attachBody = new MimeBodyPart();
 					attachBody.setFileName(path.substring(path.lastIndexOf("/")));
 					FileDataSource fds = new FileDataSource(path);
@@ -144,7 +145,7 @@ public class MailSender {
 	            // 将MiniMultipart对象设置为邮件内容  
 	            mailMessage.setContent(mainPart);  
 			}else{
-				mailMessage.setText(mailInfo.getContent());	
+				mailMessage.setText(mailTask.getContent());	
 			}
 			//mailMessage.saveChanges(); 
 			Transport.send(mailMessage);
@@ -164,8 +165,8 @@ public class MailSender {
 		if(systemMailSession != null){
 			return systemMailSession;
 		}
-		String serverHost = CustomProperty.getContextProperty("mailServerHost");
-		String serverPort = CustomProperty.getContextProperty("mailServerPort");
+		String serverHost = CustomProperty.getProperty("mailServerHost");
+		String serverPort = CustomProperty.getProperty("mailServerPort");
 		if(StringUtils.isBlank(serverHost) || StringUtils.isBlank(serverPort)){
 			throw new MailException(MailExceptionCode.CONFIG_MISS,"serverHost or serverPort");
 		}
@@ -173,9 +174,9 @@ public class MailSender {
 		props.put("mail.smtp.host", serverHost);// 邮件服务器的域名或IP
 		props.put("mail.smtp.port", serverPort);// 邮件服务器的端口
 		props.put("mail.transport.protocol", "smtp");// 发送邮件所使用的协议
-		String timeout = CustomProperty.getContextProperty("mailConnectTimeout");
+		String timeout = CustomProperty.getProperty("mailConnectTimeout");
 		props.put("mail.stmp.timeout",StringUtils.isBlank(timeout)?DEFAULT_CONNECT_TIMEOUT:timeout);
-		Boolean isSSL = Boolean.parseBoolean(CustomProperty.getContextProperty("mailIsSSL"));
+		Boolean isSSL = Boolean.parseBoolean(CustomProperty.getProperty("mailIsSSL"));
 		if (isSSL.booleanValue()) {
 			// ssl 链接发送配置
 			props.put("mail.smtp.ssl.enable", "true");
@@ -196,9 +197,9 @@ public class MailSender {
 				throw new MailException(MailExceptionCode.SSL_ERROR.getDesc(),e);
 			}
 		}
-        Boolean isAuth = Boolean.parseBoolean(CustomProperty.getContextProperty("mailIsAuth"));
-        String username = CustomProperty.getContextProperty("mailAuthUsername");
-		String password = CustomProperty.getContextProperty("mailAuthPassword");
+        Boolean isAuth = Boolean.parseBoolean(CustomProperty.getProperty("mailIsAuth"));
+        String username = CustomProperty.getProperty("mailAuthUsername");
+		String password = CustomProperty.getProperty("mailAuthPassword");
 		// 是否需要身份验证
 		Authenticator auth = null;
 		if (isAuth.booleanValue() && StringUtils.isNotBlank(username)
@@ -206,7 +207,7 @@ public class MailSender {
 			props.put("mail.smtp.auth", "true");// 授权邮件
 			auth = new MyAuthenticator(username,password);
 		}
-		String fromEmail = CustomProperty.getContextProperty("mailFromAddress");
+		String fromEmail = CustomProperty.getProperty("mailFromAddress");
 		if(StringUtils.isBlank(fromEmail)){
 			throw new MailException(MailExceptionCode.CONFIG_MISS,"mailFromAddress");
 		}

@@ -1,0 +1,17 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="com.shomop.aop" />
+ 
+	<bean id="greetingProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="interfaces" value="com.shomop.aop.Apology" />    <!-- 需要动态实现的接口 -->
+		<property name="target" ref="greetingImpl" />                    <!-- 目标类 -->
+		<property name="interceptorNames" value="greetingIntroAdvice" /> <!-- 引入增强 -->
+		<property name="proxyTargetClass" value="true" />                <!-- 代理目标类（默认为 false，代理接口） -->
+	</bean>
+
+</beans>

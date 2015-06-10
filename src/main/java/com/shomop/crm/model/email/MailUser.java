@@ -3,10 +3,9 @@ package com.shomop.crm.model.email;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.GenericGenerator;
 
 import com.shomop.crm.model.Identifier;
 /**
@@ -15,23 +14,21 @@ import com.shomop.crm.model.Identifier;
  * @date 2014-9-22
  */
 @Entity
-@Table(name = "email_user")
-public class EmailUser implements Identifier<String> {
+@Table(name = "mail_user")
+public class MailUser implements Identifier<Integer> {
 
-	private String userId;
+	private Integer id;
 	private String username;
 	private String accessToken;
 
 	@Id
-	@Column(name = "id", length = 32)
-	@GeneratedValue(generator = "system-uuid")
-	@GenericGenerator(name = "system-uuid", strategy = "uuid")
-	public String getId() {
-		return userId;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	public Integer getId() {
+		return id;
 	}
 
-	public void setId(String id) {
-		this.userId = id;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	@Column(name = "accessToken", length = 32)

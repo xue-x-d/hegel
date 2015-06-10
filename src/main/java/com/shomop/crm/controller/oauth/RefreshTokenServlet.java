@@ -1,4 +1,4 @@
-package com.shomop.crm.controller;
+package com.shomop.crm.controller.oauth;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class RefreshTokenServlet extends HttpServlet {
 	 */
 	private static final long serialVersionUID = -2618851549452127539L;
 
-	private static final String AUTH_TOKEN_URL_PREFIX = "https://auth.360buy.com/oauth/token?";
+	private static final String AUTH_TOKEN_URL_PREFIX = "https://oauth.jd.com/oauth/token?";
 
 	private static String params = "client_id=A26A075F7B5C7827BC3EBD318E836506&client_secret=37fb9f271c764ccba06b488627b6896a&grant_type=refresh_token&refresh_token=";
 	
@@ -66,10 +66,10 @@ public class RefreshTokenServlet extends HttpServlet {
 		doGet(req,resp);
 	}
 	
-	public void updateAccessToken(){
+	public static void updateAccessToken(String refreshToken){
 		RefreshTokenServlet refreshTokenServlet = new RefreshTokenServlet();
 		try {
-			refreshTokenServlet.handleRefreshToken(null);
+			refreshTokenServlet.handleRefreshToken(refreshToken);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -158,5 +158,9 @@ public class RefreshTokenServlet extends HttpServlet {
 		public void checkServerTrusted(X509Certificate[] chain, String authType)
 				throws CertificateException {
 		}
+	}
+	
+	public static void main(String[] args) {
+		updateAccessToken("501faab4-1308-44ef-a26d-b061607e6ab2");
 	}
 }

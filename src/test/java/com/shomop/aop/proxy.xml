@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- 扫描指定包（将 @Component 注解的类自动定义为 Spring Bean） -->
+	<context:component-scan base-package="com.shomop.aop" />
+
+	<!-- 配置一个代理 -->
+	<bean id="greetingProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="interfaces" value="aop.Greeting" /> <!-- 需要代理的接口 -->
+		<property name="target" ref="greetingImpl" />       <!-- 接口实现类 -->
+		<property name="interceptorNames">                 <!-- 拦截器名称（也就是增强类名称，Spring Bean 的 id） -->
+			<list>
+				<value>greetingAroundAdvice</value>
+			</list>
+		</property>
+	</bean>
+	
+    <!--  introduction -->	
+	<bean id="greetingProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="interfaces" value="aop.demo.Apology"/>          <!-- 需要动态实现的接口 -->
+        <property name="target" ref="greetingImpl"/>                    <!-- 目标类 -->
+        <property name="interceptorNames" value="greetingIntroAdvice"/> <!-- 引入增强 -->
+        <property name="proxyTargetClass" value="true"/>                <!-- 代理目标类（默认为 false，代理接口） -->
+    </bean>
+    
+    <!-- 配置一个切面 -->
+    <bean id="greetingAdvisor" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+        <property name="advice" ref="greetingAroundAdvice"/>            <!-- 增强 -->
+        <property name="pattern" value="aop.demo.GreetingImpl.good.*"/> <!-- 切点（正则表达式） -->
+    </bean>
+    
+    <!-- 自动扫描 -->
+    <bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+        <property name="beanNames" value="*Impl"/>                       <!-- 只为后缀是“Impl”的 Bean 生成代理 -->
+        <property name="interceptorNames" value="greetingAroundAdvice"/> <!-- 增强 -->
+        <property name="optimize" value="true"/>                         <!-- 是否对代理生成策略进行优化 -->
+    </bean>
+    
+    <aop:config>
+     <aop:advisor advice-ref="" pointcut=""  pointcut-ref=""/>
+     <aop:aspect>
+       <aop:pointcut expression="" id=""/>
+       <aop:before method="" arg-names="" pointcut=""/>
+     </aop:aspect>
+    </aop:config>
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+</beans>

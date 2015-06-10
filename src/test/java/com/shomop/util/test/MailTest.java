@@ -14,7 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
-import com.shomop.util.mail.MailInfo;
+import com.shomop.crm.model.email.MailTask;
 import com.shomop.util.mail.MailSender;
 
 @ActiveProfiles("develop")
@@ -46,7 +46,7 @@ public class MailTest extends AbstractJUnit4SpringContextTests {
 	
 	@Test
 	public void testSendMail(){
-		MailInfo mailInfo = new MailInfo();
+		MailTask mailInfo = new MailTask();
 		mailInfo.getTo().add("710709510@qq.com");
 		mailInfo.setTitle("系统默认personal");
 		mailInfo.setContent("测试系统默认发件人姓名");
@@ -82,5 +82,7 @@ public class MailTest extends AbstractJUnit4SpringContextTests {
 		System.out.println(host);
 		
 		System.out.println(System.getenv("NODE_ENV"));
+		
+		
 	}
 }
