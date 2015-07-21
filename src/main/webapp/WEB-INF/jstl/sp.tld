@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee web-jsptaglibrary_2_0.xsd"
+	version="2.0">
+
+	<description>JSTL 1.1 core library</description>
+	<display-name>shomop core tag</display-name>
+	<tlib-version>1.1</tlib-version>
+	<short-name>sp</short-name>
+	<uri>http://www.shomop.com/mytag</uri>
+
+	<!-- 显示IP地址 -->
+	<tag>
+		<description>
+			Catches any Throwable that occurs in its body and optionally
+			exposes it.
+		</description>
+		<name>viewIP</name>
+		<tag-class>shomop.tag.ViewIpTag</tag-class>
+		<body-content>empty</body-content>
+	</tag>
+	
+	<tag>
+		<description>
+			Catches any Throwable that occurs in its body and optionally
+			exposes it.
+		</description>
+		<name>demo1</name>
+		<tag-class>shomop.tag.TagDemo1</tag-class>
+		<body-content>JSP</body-content>
+	</tag>  
+	<!-- 是否显示标签体 -->  
+ <tag>
+	<description>
+		Catches any Throwable that occurs in its body and optionally
+		exposes it.
+	</description>
+	<name>demo2</name>
+	<tag-class>shomop.tag.TagDemo2</tag-class>
+	<body-content>JSP</body-content>
+</tag>  
+
+<!-- 控制标签体重复输出 -->  
+<tag>  
+  <description>  
+      Catches any Throwable that occurs in its body and optionally  
+      exposes it.  
+  </description>  
+  <name>demo3</name>  
+  <tag-class>shomop.tag.TagDemo3</tag-class>  
+  <body-content>JSP</body-content>  
+</tag>  
+
+  <!-- 控制标签体重复输出 -->  
+  <tag>  
+    <description>  
+        Catches any Throwable that occurs in its body and optionally  
+        exposes it.  
+    </description>  
+    <name>demo</name>  
+    <tag-class>shomop.tag.PropertyTag</tag-class>  
+    <body-content>scriptless</body-content>  
+    <attribute>  
+        <description>  
+            Name of the exported scoped variable for the  
+            exception thrown from a nested action. The type of the  
+            scoped variable is the type of the exception thrown.  
+        </description>  
+        <name>count</name>  
+        <required>true</required>
+        <type>int</type>
+        <rtexprvalue>true</rtexprvalue>  
+    </attribute>  
+  </tag>  
+</taglib>  

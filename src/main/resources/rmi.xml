@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean id="serviceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
+		<property name="serviceName" value="MobileAccountService" />
+		<property name="service" ref="accountService" />
+		<property name="serviceInterface" value="com.shomop.rmi.service.AccountService" />
+		<property name="registryPort" value="8080" />
+		<!--  <property name="servicePort" value="8080" />-->
+	</bean>
+
+	<bean id="accountService" class="com.shomop.rmi.service.impl.MobileAccountServiceImpl" />
+	
+	<bean id="mobileAccountService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">  
+        <property name="serviceUrl" value="rmi://10.0.0.103:8080/MobileAccountService" />  
+        <property name="serviceInterface"  
+            value="com.shomop.rmi.service.AccountService"/>  
+    </bean>  
+</beans>
